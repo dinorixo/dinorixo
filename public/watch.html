@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DIXORINO - Watch</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;
+ background:#08090d;
+ color:#fff;
+ font-family:Arial,sans-serif;
+}
+header{
+ height:70px;
+ background:#10121a;
+ display:flex;
+ align-items:center;
+ padding:0 25px;
+ gap:35px;
+}
+.logo{
+ color:#ff3f91;
+ font-size:28px;
+ font-weight:800;
+}
+a{color:#fff;text-decoration:none}
+.container{
+ max-width:1100px;
+ margin:auto;
+ padding:25px;
+}
+.back{
+ color:#ff4b96;
+ display:inline-block;
+ margin-bottom:20px;
+}
+.player{
+ width:100%;
+ aspect-ratio:16/9;
+ background:#000;
+ border-radius:12px;
+ overflow:hidden;
+}
+video{
+ width:100%;
+ height:100%;
+ display:block;
+ background:#000;
+}
+.no-video{
+ height:100%;
+ display:flex;
+ flex-direction:column;
+ justify-content:center;
+ align-items:center;
+ text-align:center;
+ padding:30px;
+ color:#aaa;
+}
+.no-video h2{color:white}
+.info{
+ padding:20px 0;
+}
+.info h1{font-size:28px}
+.episodes{
+ display:grid;
+ grid-template-columns:repeat(4,1fr);
+ gap:10px;
+}
+.ep{
+ background:#191c26;
+ border:0;
+ color:white;
+ padding:14px 8px;
+ border-radius:8px;
+ font-size:15px;
+}
+.ep.active,.ep:hover{
+ background:#ff3f91;
+}
+@media(max-width:600px){
+ .episodes{grid-template-columns:repeat(3,1fr)}
+ header{padding:0 18px}
+ .container{padding:18px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<div class="logo">DIXORINO</div>
+<a href="/">Home</a>
+</header>
+
+<div class="container">
+
+<a class="back" href="javascript:history.back()">← Back</a>
+
+<div class="player">
+
+<video id="player" controls playsinline>
+</video>
+
+<div class="no-video" id="message">
+<h2>Episode ready</h2>
+<p>This episode doesn't have a licensed video source yet.</p>
+<p>Add your own video URL later and it will play here.</p>
+</div>
+
+</div>
+
+<div class="info">
+<h1 id="title">Anime</h1>
+<p id="episode">Episode 1</p>
+</div>
+
+<h2>Episodes</h2>
+
+<div class="episodes" id="episodes"></div>
+
+</div>
+
+<script>
+
+const params = new URLSearchParams(location.search);
+
+const anime = params.get("anime") || "One Piece";
+let current = Number(params.get("episode")) || 1;
+
+document.getElementById("title").textContent = anime;
+
+const player = document.getElementById("player");
+const message = document.getElementById("message");
+
+/*
+ Put your OWN licensed/public-domain video URLs here later.
+
+ Example:
+
+1: "https://example.com/episode1.mp4",
+2: "https://example.com/episode2.mp4"
+
+*/
+
+const videos = {
+};
+
+function loadEpisode(ep){
+
+ current = ep;
+
+ document.getElementById("episode").textContent =
+ "Episode " + ep;
+
+ document.querySelectorAll(".ep").forEach((b,i)=>{
+   b.classList.toggle("active",i+1===ep);
+ });
+
+ const url = videos[ep];
+
+ if(url){
+   message.style.display="none";
+   player.style.display="block";
+   player.src=url;
+   player.load();
+ }else{
+   player.pause();
+   player.removeAttribute("src");
+   player.load();
+   player.style.display="none";
+   message.style.display="flex";
+ }
+
+ history.replaceState(
+   {},
+   "",
+   "?anime="+encodeURIComponent(anime)+"&episode="+ep
+ );
+}
+
+const box=document.getElementById("episodes");
+
+for(let i=1;i<=12;i++){
+
+ const button=document.createElement("button");
+
+ button.className="ep";
+ button.textContent="Episode "+i;
+
+ button.onclick=()=>loadEpisode(i);
+
+ box.appendChild(button);
+}
+
+loadEpisode(current);
+
+</script>
+
+
+<video controls playsinline style="width:100%;max-height:500px;border-radius:16px;background:#000;margin-bottom:25px;">
+  <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4">
+  Your browser does not support video playback.
+</video>
+
+</body>
+</html>
