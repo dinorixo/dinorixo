@@ -531,31 +531,38 @@ style="display:flex;align-items:center;justify-content:center;font-size:40px">
 const genreList=[["Action",1],["Adventure",2],["Comedy",4],["Fantasy",10],["Romance",22],["Sports",30],["Horror",14],["Mystery",7],["Sci-Fi",24],["Supernatural",37]];
 document.getElementById("genres").innerHTML=genreList.map(g=>`<button style="background:#191c26;color:white;border:0;padding:11px 16px;border-radius:20px" onclick="openGenre(${g[1]},'${g[0]}')">${g[0]}</button>`).join("");
 async function openGenre(id,name){
+  document.getElementById("searchSection").style.display="block";
+  document.getElementById("results").innerHTML =
+    "<div class='loading'>Loading "+name+" anime...</div>";
 
-document.getElementById("searchSection").style.display="block";
-document.getElementById("results").innerHTML=
-"<div class='loading'>Finding "+name+" anime...</div>";
+  try{
+    const response = await fetch(API+"/top/anime?limit=25");
 
-try{
+    if(!response.ok) throw new Error("API error");
 
-let matches=[];
-let page=1;
+    const json = await response.json();
+    const all = json.data || [];
 
-while(matches.length<12 && page<=3){
+    const data = all.filter(anime =>
+      (anime.genres || []).some(g => Number(g.mal_id) === Number(id))
+    );
 
-const response=await fetch(
-API+"/top/anime?page="+page+"&limit=25"
-);
+    document.getElementById("results").innerHTML =
+      "<h2>"+name+" Anime</h2>" +
+      (data.length
+        ? data.map(createCard).join("")
+        : "<div class='loading'>No "+name+" anime found in the current list.</div>");
 
-if(!response.ok) throw new Error("API error");
+    window.scrollTo({
+      top: document.getElementById("searchSection").offsetTop-80,
+      behavior:"smooth"
+    });
 
-const json=await response.json();
-const anime=json.data||[];
-
-for(const a of anime){
-
-if((a.genres||[]).some(g=>g.mal_id===id)){
-matches.push(a);
+  }catch(e){
+    console.error(e);
+    document.getElementById("results").innerHTML =
+      "<div class='loading'>Could not load "+name+" anime right now.</div>";
+  }
 }
 
 if(matches.length>=12) break;
