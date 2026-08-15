@@ -1078,10 +1078,20 @@ const API="https://api.jikan.moe/v4";
 
 window.addEventListener("error",function(e){
   console.error("DIXORINO ERROR:",e.error||e.message);
+
+  document.body.insertAdjacentHTML(
+    "afterbegin",
+    '<div id="debugError" style="position:fixed;top:10px;left:10px;right:10px;z-index:99999;background:#220d16;color:#ff6b9d;padding:15px;border:2px solid #ff3f91;border-radius:12px;font:13px monospace;white-space:pre-wrap;">JS ERROR: '+String(e.message||e.error)+'</div>'
+  );
 });
 
 window.addEventListener("unhandledrejection",function(e){
   console.error("DIXORINO PROMISE ERROR:",e.reason);
+
+  document.body.insertAdjacentHTML(
+    "afterbegin",
+    '<div id="debugPromise" style="position:fixed;top:10px;left:10px;right:10px;z-index:99999;background:#220d16;color:#ff6b9d;padding:15px;border:2px solid #ff3f91;border-radius:12px;font:13px monospace;white-space:pre-wrap;">PROMISE ERROR: '+String(e.reason)+'</div>'
+  );
 });
 
 let favorites=
