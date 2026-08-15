@@ -60,10 +60,14 @@ export default {
         });
 
         if (!response.ok) {
-          return Response.json(
-            { error: "Anime search temporarily unavailable" },
-            { status: response.status }
-          );
+          const errorText = await response.text();
+
+          return new Response(errorText || "AniList error", {
+            status: response.status,
+            headers: {
+              "content-type": "application/json"
+            }
+          });
         }
 
         const json = await response.json();
