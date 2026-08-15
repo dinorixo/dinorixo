@@ -246,6 +246,37 @@ return String(text)
 .replace(/'/g,"&#039;");
 }
 
+let favorites=
+JSON.parse(
+  localStorage.getItem("dixorinoFavorites")||"[]"
+).map(Number);
+
+function toggleFavorite(event,id){
+
+event.stopPropagation();
+
+id=Number(id);
+
+if(favorites.includes(id)){
+  favorites=favorites.filter(x=>x!==id);
+}else{
+  favorites.push(id);
+}
+
+localStorage.setItem(
+  "dixorinoFavorites",
+  JSON.stringify(favorites)
+);
+
+const heart=event.currentTarget;
+
+const isFav=favorites.includes(id);
+
+heart.classList.toggle("on",isFav);
+heart.textContent=isFav?"♥":"♡";
+
+}
+
 function createCard(a){
 
 const title=
@@ -259,10 +290,19 @@ a.coverImage?.large||
 a.coverImage?.medium||
 "";
 
+const id=Number(a.id);
+const fav=favorites.includes(id);
+
 return `
 <div
 class="card"
-onclick="location.href='details.html?anilist=${a.id}'">
+onclick="location.href='details.html?anilist=${id}'">
+
+<button
+class="heart ${fav?"on":""}"
+onclick="toggleFavorite(event,${id})">
+${fav?"♥":"♡"}
+</button>
 
 <img
 class="poster"
