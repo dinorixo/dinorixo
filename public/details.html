@@ -41,19 +41,18 @@ async function loadDetails() {
   try {
     const grid = document.getElementById("episode-grid");
     
-    // First, try loading episodes assuming the ID is an AniList ID
+    // 1. Try loading episodes assuming the ID is an AniList ID
     let epRes = await fetch(`/api/episodes?id=${id}`);
     let epData = await epRes.json();
     let episodeList = epData.episodes || [];
 
-    // Fallback: If it returns empty, try searching the title mapping 
+    // 2. If it is empty, search by title map to resolve the ID automatically
     if (episodeList.length === 0) {
       document.getElementById("anime-title").textContent = "Resolving database paths...";
-      // We search the AniList API internally using our query ID string to find the exact target match
       const searchRes = await fetch(`/api/search?q=${id}`);
       const searchData = await searchRes.json();
       if (searchData.data && searchData.data.length > 0) {
-        id = searchData.data[0].mal_id; // Remap the active routing parameter
+        id = searchData.data[0].mal_id; // FIX: Select the first matching element array item
         epRes = await fetch(`/api/episodes?id=${id}`);
         epData = await epRes.json();
         episodeList = epData.episodes || [];
