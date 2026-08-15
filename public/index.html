@@ -565,43 +565,6 @@ async function openGenre(id,name){
   }
 }
 
-if(matches.length>=12) break;
-
-}
-
-page++;
-
-}
-
-if(matches.length){
-
-document.getElementById("results").innerHTML=
-"<h2>"+name+" Anime</h2>"+
-matches.map(createCard).join("");
-
-}else{
-
-document.getElementById("results").innerHTML=
-"<div class='loading'>No "+name+" anime found.</div>";
-
-}
-
-window.scrollTo({
-top:document.getElementById("searchSection").offsetTop-80,
-behavior:"smooth"
-});
-
-}catch(e){
-
-console.error(e);
-
-document.getElementById("results").innerHTML=
-"<div class='loading'>Could not load "+name+
-" anime right now. Please try again.</div>";
-
-}
-
-}
 
 let timer;
 
