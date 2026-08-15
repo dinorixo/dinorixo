@@ -1189,397 +1189,31 @@ encodeURIComponent(id);
 
 function toggleFavorite(event,id){
 
-event.stopPropagation();
+  event.stopPropagation();
 
-if(favorites.includes(id)){
+  id=Number(id);
 
-favorites=
-favorites.filter(x=>x!==id);
+  if(!id)return;
 
-}else{
+  if(favorites.includes(id)){
 
-favorites.push(id);
+    favorites=favorites.filter(x=>Number(x)!==id);
 
-}
+  }else{
 
-localStorage.setItem(
-"dixorinoFavorites",
-JSON.stringify(favorites)
-);
+    favorites.push(id);
 
-loadFavorites();
-
-}
-
-async function getAnime(url){
-
-  const response=await fetch(url);
-
-  if(!response.ok){
-    throw new Error("Jikan API error: "+response.status);
   }
 
-  const data=await response.json();
-
-  return data.data||[];
-
-}
-
-async function aniListRequest(query){
-
-  const response=await fetch(
-    "https://graphql.anilist.co",
-    {
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json",
-        "Accept":"application/json"
-      },
-      body:JSON.stringify({query})
-    }
+  localStorage.setItem(
+    "dixorinoFavorites",
+    JSON.stringify(favorites)
   );
 
-  if(!response.ok){
-    throw new Error("AniList HTTP "+response.status);
-  }
-
-  const json=await response.json();
-
-  if(json.errors){
-    throw new Error(
-      json.errors[0]?.message||"AniList error"
-    );
-  }
-
-  return json.data;
-}
-
-
-function aniAnime(a){
-
-  return {
-    mal_id:a.idMal||a.id,
-    anilist_id:a.id,
-
-    title:
-      a.title?.english||
-      a.title?.romaji||
-      a.title?.native||
-      "Unknown",
-
-    images:{
-      jpg:{
-        large_image_url:
-          a.coverImage?.large||
-          a.coverImage?.medium||
-          ""
-      }
-    },
-
-    score:a.averageScore
-      ? a.averageScore/10
-      : null,
-
-    episodes:a.episodes
-  };
+  loadFavorites();
 
 }
 
-
-async function loadPopular(){
-
-  const box=document.getElementById("popularGrid");
-
-  try{
-
-    box.innerHTML=
-      "<div class='loading'>Loading popular anime...</div>";
-
-    const data=await aniListRequest(`
-      query{
-        Page(page:1,perPage:18){
-          media(
-            type:ANIME,
-            sort:[POPULARITY_DESC]
-          ){
-            id
-            idMal
-            title{
-              english
-              romaji
-              native
-            }
-            coverImage{
-              large
-              medium
-            }
-            averageScore
-            episodes
-          }
-        }
-      }
-    `);
-
-    const anime=
-      (data.Page?.media||[]).map(aniAnime);
-
-    box.innerHTML=anime.length
-      ? anime.map(createCard).join("")
-      : "<div class='loading'>No popular anime.</div>";
-
-  }catch(error){
-
-    console.error("POPULAR:",error);
-
-    box.innerHTML=
-      "<div class='loading'>Popular anime unavailable.</div>";
-
-  }
-
-}
-
-
-async function loadLatest(){
-
-  const box=document.getElementById("latest");
-
-  try{
-
-    box.innerHTML=
-      "<div class='loading'>Loading latest anime...</div>";
-
-    const data=await aniListRequest(`
-      query{
-        Page(page:1,perPage:18){
-          media(
-            type:ANIME,
-            sort:[START_DATE_DESC]
-          ){
-            id
-            idMal
-            title{
-              english
-              romaji
-              native
-            }
-            coverImage{
-              large
-              medium
-            }
-            averageScore
-            episodes
-          }
-        }
-      }
-    `);
-
-    const anime=
-      (data.Page?.media||[]).map(aniAnime);
-
-    box.innerHTML=anime.length
-      ? anime.map(createCard).join("")
-      : "<div class='loading'>No latest anime.</div>";
-
-  }catch(error){
-
-    console.error("LATEST:",error);
-
-    box.innerHTML=
-      "<div class='loading'>Latest anime unavailable.</div>";
-
-  }
-
-}
-
-
-let searchPage = 1;
-let currentSearch = "";
-let searchLoading = false;
-let searchHasNext = false;
-
-async function searchAnime(query, append=false){
-
-  query=query.trim();
-
-  if(!query){
-    document.getElementById("searchSection").style.display="none";
-    currentSearch="";
-    searchPage=1;
-    return;
-  }
-
-  if(searchLoading)return;
-
-  if(!append){
-    currentSearch=query;
-    searchPage=1;
-    document.getElementById("searchSection").style.display="block";
-    document.getElementById("results").innerHTML=
-      "<div class='loading'>Searching...</div>";
-  }
-
-  searchLoading=true;
-
-  try{
-
-    const graphql = `
-      query ($search: String, $page: Int) {
-        Page(page: $page, perPage: 24) {
-          pageInfo {
-            hasNextPage
-          }
-          media(
-            search: $search,
-            type: ANIME,
-            sort: SEARCH_MATCH
-          ) {
-            id
-            idMal
-            title {
-              romaji
-              english
-              native
-            }
-            coverImage {
-              large
-              medium
-            }
-            averageScore
-            episodes
-            genres
-            status
-          }
-        }
-      }
-    `;
-
-    const response = await fetch(
-      "https://graphql.anilist.co",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json"
-        },
-        body: JSON.stringify({
-          query: graphql,
-          variables: {
-            search: currentSearch,
-            page: searchPage
-          }
-        })
-      }
-    );
-
-    if(!response.ok){
-      throw new Error(
-        "AniList search failed: "+response.status
-      );
-    }
-
-    const json = await response.json();
-
-    if(json.errors){
-      throw new Error(json.errors[0]?.message || "AniList error");
-    }
-
-    const page=json.data?.Page;
-
-    const data=page?.media||[];
-
-    searchHasNext=!!page?.pageInfo?.hasNextPage;
-
-    const converted=data.map(a => ({
-      mal_id: a.idMal || null,
-      anilist_id: a.id,
-      title:
-        a.title?.english ||
-        a.title?.romaji ||
-        a.title?.native ||
-        "Unknown",
-      images:{
-        jpg:{
-          large_image_url:
-            a.coverImage?.large ||
-            a.coverImage?.medium ||
-            ""
-        }
-      },
-      score:
-        a.averageScore ?
-        a.averageScore / 10 :
-        null,
-      episodes:a.episodes,
-      genres:(a.genres||[]).map(name => ({
-        mal_id:0,
-        name
-      }))
-    }));
-
-    const results=document.getElementById("results");
-
-    if(!append){
-      results.innerHTML="";
-    }
-
-    if(!converted.length && !append){
-      results.innerHTML=
-        "<div class='loading'>No anime found.</div>";
-      return;
-    }
-
-    const oldLoadMore=document.getElementById(
-      "searchLoadMore"
-    );
-
-    if(oldLoadMore){
-      oldLoadMore.remove();
-    }
-
-    results.insertAdjacentHTML(
-      "beforeend",
-      converted.map(createCard).join("")
-    );
-
-    if(searchHasNext){
-
-      const button=document.createElement("button");
-
-      button.id="searchLoadMore";
-      button.className="load-more";
-      button.textContent="Load More Anime";
-
-      button.onclick=async function(){
-
-        button.disabled=true;
-        button.textContent="Loading...";
-
-        searchPage++;
-
-        await searchAnime(currentSearch,true);
-
-      };
-
-      results.appendChild(button);
-
-    }
-
-  }catch(error){
-
-    console.error(error);
-
-    document.getElementById("results").insertAdjacentHTML(
-      "beforeend",
-      "<div class='loading'>Search is temporarily unavailable. Please try again.</div>"
-    );
-
-  }finally{
-
-    searchLoading=false;
-
-  }
-
-}
 
 function loadFavorites(){
 
@@ -1587,22 +1221,29 @@ function loadFavorites(){
   const grid=document.getElementById("favoritesGrid");
 
   if(!favorites.length){
+
     section.style.display="none";
     return;
+
   }
 
   section.style.display="block";
-  grid.innerHTML="<div class='loading'>Loading favorites...</div>";
+
+  grid.innerHTML=
+    "<div class='loading'>Loading favorites...</div>";
 
   const query=`
     query($ids:[Int]){
       Page(page:1,perPage:50){
-        media(id_in:$ids,type:ANIME){
+        media(
+          id_in:$ids,
+          type:ANIME
+        ){
           id
           idMal
           title{
-            romaji
             english
+            romaji
             native
           }
           coverImage{
@@ -1611,58 +1252,82 @@ function loadFavorites(){
           }
           averageScore
           episodes
-          genres
         }
       }
     }
   `;
 
-  fetch("https://graphql.anilist.co",{
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json",
-      "Accept":"application/json"
-    },
-    body:JSON.stringify({
-      query:query,
-      variables:{ids:favorites}
-    })
-  })
-  .then(r=>r.json())
+  fetch(
+    "https://graphql.anilist.co",
+    {
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "Accept":"application/json"
+      },
+      body:JSON.stringify({
+        query:query,
+        variables:{
+          ids:favorites.map(Number)
+        }
+      })
+    }
+  )
+  .then(response=>response.json())
   .then(json=>{
 
     if(json.errors){
-      throw new Error(json.errors[0]?.message||"AniList error");
+
+      throw new Error(
+        json.errors[0]?.message||"AniList error"
+      );
+
     }
 
-    const data=json.data?.Page?.media||[];
+    const anime=json.data?.Page?.media||[];
 
-    grid.innerHTML=data.length
-      ? data.map(a=>({
-          mal_id:a.idMal||a.id,
-          anilist_id:a.id,
-          title:
-            a.title?.english||
-            a.title?.romaji||
-            a.title?.native||
-            "Unknown",
-          images:{
-            jpg:{
-              large_image_url:
-                a.coverImage?.large||
-                a.coverImage?.medium||
-                ""
-            }
-          },
-          score:a.averageScore ? a.averageScore/10 : null,
-          episodes:a.episodes
-        })).map(createCard).join("")
-      : "<div class='loading'>No favorite anime found.</div>";
+    if(!anime.length){
+
+      grid.innerHTML=
+        "<div class='loading'>No favorite anime found.</div>";
+
+      return;
+
+    }
+
+    grid.innerHTML=anime.map(a=>({
+
+      mal_id:a.idMal||a.id,
+
+      anilist_id:a.id,
+
+      title:
+        a.title?.english||
+        a.title?.romaji||
+        a.title?.native||
+        "Unknown",
+
+      images:{
+        jpg:{
+          large_image_url:
+            a.coverImage?.large||
+            a.coverImage?.medium||
+            ""
+        }
+      },
+
+      score:a.averageScore
+        ? a.averageScore/10
+        : null,
+
+      episodes:a.episodes
+
+    })).map(createCard).join("");
 
   })
   .catch(error=>{
 
-    console.error("Favorites:",error);
+    console.error("FAVORITES:",error);
 
     grid.innerHTML=
       "<div class='loading'>Unable to load favorites.</div>";
