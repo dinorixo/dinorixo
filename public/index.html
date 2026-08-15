@@ -1199,20 +1199,34 @@ function toggleFavorite(event,id){
 
 event.stopPropagation();
 
+id=Number(id);
+
+if(!id)return;
+
 if(favorites.includes(id)){
-
-favorites=favorites.filter(x=>x!==id);
-
+  favorites=favorites.filter(x=>Number(x)!==id);
 }else{
-
-favorites.push(id);
-
+  favorites.push(id);
 }
 
 localStorage.setItem(
-"dixorinoFavorites",
-JSON.stringify(favorites)
+  "dixorinoFavorites",
+  JSON.stringify(favorites)
 );
+
+/* Immediately update the heart */
+const card=event.currentTarget.closest(".card");
+
+if(card){
+  const heart=card.querySelector(".heart");
+
+  if(heart){
+    const isFav=favorites.includes(id);
+
+    heart.classList.toggle("on",isFav);
+    heart.textContent=isFav?"♥":"♡";
+  }
+}
 
 loadFavorites();
 
@@ -1224,6 +1238,8 @@ function loadFavorites(){
 const section=document.getElementById("favoritesSection");
 const grid=document.getElementById("favoritesGrid");
 
+if(!section || !grid)return;
+
 if(!favorites.length){
   section.style.display="none";
   return;
@@ -1231,6 +1247,15 @@ if(!favorites.length){
 
 section.style.display="block";
 grid.innerHTML="<div class='loading'>Loading favorites...</div>";
+
+const ids=favorites
+  .map(Number)
+  .filter(id=>Number.isInteger(id) && id>0);
+
+if(!ids.length){
+  section.style.display="none";
+  return;
+}
 
 const query=`
 query($ids:[Int]){
@@ -1258,14 +1283,14 @@ query($ids:[Int]){
 }
 `;
 
-aniListRequest(query,{ids:favorites})
+aniListRequest(query,{ids:ids})
 .then(data=>{
 
   const anime=(data.Page?.media||[]).map(aniAnime);
 
   grid.innerHTML=anime.length
-    ? anime.map(createCard).join("")
-    : "<div class='loading'>No favorites found.</div>";
+    ?anime.map(createCard).join("")
+    :"<div class='loading'>No favorites found.</div>";
 
 })
 .catch(error=>{
