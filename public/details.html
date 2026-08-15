@@ -35,6 +35,134 @@ h1{font-size:27px}
 .episodes{grid-template-columns:repeat(3,1fr)}
 }
 
+
+/* ===== DIXORINO DETAILS UPGRADE ===== */
+
+.details-back{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:18px;
+  color:#bbb;
+  text-decoration:none;
+  font-weight:600;
+  transition:.2s;
+}
+
+.details-back:hover{
+  color:#ff3f91;
+  transform:translateX(-3px);
+}
+
+.hero{
+  position:relative;
+  isolation:isolate;
+}
+
+.hero::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(circle at 10% 20%,rgba(255,63,145,.12),transparent 35%),
+    radial-gradient(circle at 90% 80%,rgba(155,92,255,.10),transparent 35%);
+  z-index:-1;
+  pointer-events:none;
+}
+
+.details-poster-wrap{
+  flex-shrink:0;
+}
+
+.details-poster-wrap .poster{
+  display:block;
+}
+
+.detail-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:18px;
+}
+
+.favorite{
+  cursor:pointer;
+}
+
+.watch-first{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  background:#191c26;
+  color:#fff;
+  border:1px solid rgba(255,255,255,.1);
+  padding:13px 22px;
+  border-radius:11px;
+  font-weight:700;
+  cursor:pointer;
+  text-decoration:none;
+}
+
+.watch-first:hover{
+  background:linear-gradient(90deg,#ff3f91,#9b5cff);
+}
+
+.meta-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:16px 0;
+}
+
+.meta-pill{
+  background:rgba(255,255,255,.055);
+  border:1px solid rgba(255,255,255,.08);
+  color:#ddd;
+  padding:7px 11px;
+  border-radius:999px;
+  font-size:13px;
+}
+
+.section-title{
+  margin-top:32px;
+  margin-bottom:12px;
+}
+
+.episode-count{
+  color:#888;
+  font-size:14px;
+  font-weight:normal;
+}
+
+@media(max-width:700px){
+
+  .hero{
+    padding:18px !important;
+  }
+
+  .details-poster-wrap{
+    display:flex;
+    justify-content:center;
+  }
+
+  .details-poster-wrap .poster{
+    width:180px;
+    height:265px;
+  }
+
+  .detail-actions{
+    flex-direction:column;
+  }
+
+  .detail-actions button,
+  .detail-actions a{
+    width:100%;
+    text-align:center;
+  }
+
+}
+
+
 /* ================================
    DIXORINO 2.0 — MODERN UI
    ================================ */
@@ -487,9 +615,12 @@ document.getElementById("anime").innerHTML=`
 
 <div class="hero">
 
+<div class="details-poster-wrap">
 <img class="poster"
 src="${a.images?.jpg?.large_image_url||""}"
-alt="${safe(a.title)}">
+alt="${safe(a.title)}"
+loading="eager">
+</div>
 
 <div class="content">
 
@@ -511,9 +642,17 @@ ${safe(a.synopsis||"No description available.")}
 ⭐ Rating: ${safe(a.rating||"Not rated")}
 </div>
 
+<div class="detail-actions">
+
 <button class="favorite" id="fav">
 ♡ Add to Favorites
 </button>
+
+<button class="watch-first" id="watchFirst">
+▶ Start Watching
+</button>
+
+</div>
 
 </div>
 </div>
@@ -528,6 +667,7 @@ ${safe(a.synopsis||"No description available.")}
 `;
 
 setupFavorite();
+setupWatchButton();
 loadTrailer();
 loadEpisodes();
 
@@ -663,6 +803,22 @@ function openEpisode(number){
     "&episode="+number+
     "&id="+(animeData.mal_id||id)+
     "&total="+(animeData.episodes||12);
+
+}
+
+function setupWatchButton(){
+
+const button=document.getElementById("watchFirst");
+
+if(!button || !animeData){
+  return;
+}
+
+button.onclick=()=>{
+
+openEpisode(1);
+
+};
 
 }
 
