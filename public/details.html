@@ -277,57 +277,65 @@ async function loadEpisodes(){
 
   const box=document.getElementById("episodes");
 
-  // AniList doesn't provide streaming episode lists.
-  // If we have a MAL ID, try Jikan.
-  if(!animeData?.mal_id){
+  const total=Number(animeData?.episodes)||0;
 
+  if(!total){
     box.innerHTML=
-      "<div class='loading'>Episode information unavailable for this anime.</div>";
-
+      "<div class='loading'>No episode information available.</div>";
     return;
+  }
+
+  let episodes=[];
+
+  /*
+   * If we have a MAL ID, get the real episode list.
+   * Otherwise use AniList's episode count.
+   */
+
+  if(animeData?.mal_id){
+
+    try{
+
+      const r=await fetch(
+        API+"/anime/"+animeData.mal_id+"/episodes"
+      );
+
+      if(r.ok){
+
+        const x=await r.json();
+        episodes=x.data||[];
+
+      }
+
+    }catch(e){
+
+      console.log("Jikan episode list unavailable");
+
+    }
 
   }
 
-  try{
+  /*
+   * Fallback for anime without MAL episode data.
+   */
 
-    const r=await fetch(
-      API+"/anime/"+animeData.mal_id+"/episodes"
+  if(!episodes.length){
+
+    episodes=Array.from(
+      {length:total},
+      (_,i)=>({mal_id:i+1})
     );
 
-    if(!r.ok){
-      throw new Error("Episode API failed");
-    }
-
-    const x=await r.json();
-
-    const episodes=x.data||[];
-
-    if(!episodes.length){
-
-      box.innerHTML=
-        "<div class='loading'>No episode information available.</div>";
-
-      return;
-
-    }
-
-    box.innerHTML=episodes.map(ep=>`
-
-      <button class="ep"
-        onclick="openEpisode(${ep.mal_id})">
-        Episode ${ep.mal_id}
-      </button>
-
-    `).join("");
-
-  }catch(e){
-
-    console.log("Episodes unavailable",e);
-
-    box.innerHTML=
-      "<div class='loading'>Episode information unavailable.</div>";
-
   }
+
+  box.innerHTML=episodes.map(ep=>`
+
+    <button class="ep"
+      onclick="openEpisode(${ep.mal_id})">
+      Episode ${ep.mal_id}
+    </button>
+
+  `).join("");
 
 }
 
