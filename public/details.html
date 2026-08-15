@@ -4,36 +4,263 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>DIXORINO - Anime</title>
+
 <style>
-*{box-sizing:border-box}body{margin:0;background:#08090d;color:#fff;font-family:Arial}
-header{height:65px;background:#11131b;display:flex;align-items:center;padding:0 20px;gap:25px}.logo{font-size:25px;font-weight:bold;color:#ff3d91}a{color:white;text-decoration:none}
-main{max-width:1000px;margin:auto;padding:25px 18px}.back{color:#ff3d91}
-.box{margin-top:25px;background:#151821;padding:30px;border-radius:15px}
-.poster{width:180px;height:250px;object-fit:cover;border-radius:10px;background:#222}
-h1{font-size:35px}.tags{display:flex;gap:8px;flex-wrap:wrap}.tag{background:#292d38;padding:9px 14px;border-radius:20px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px}.ep{background:#191c26;padding:15px;text-align:center;border-radius:8px}.ep:hover{background:#ff3d91}
+*{box-sizing:border-box}
+body{
+margin:0;
+background:#08090d;
+color:white;
+font-family:Arial,sans-serif
+}
+header{
+height:70px;
+background:#10121a;
+display:flex;
+align-items:center;
+padding:0 20px
+}
+.logo{
+font-size:27px;
+font-weight:900;
+color:#ff3f91
+}
+header a{
+color:white;
+text-decoration:none;
+margin-left:25px
+}
+main{
+max-width:1100px;
+margin:auto;
+padding:25px
+}
+.back{
+color:#ff3f91;
+text-decoration:none
+}
+.hero{
+display:flex;
+gap:30px;
+margin-top:25px;
+background:#12151d;
+padding:25px;
+border-radius:16px
+}
+.poster{
+width:230px;
+height:330px;
+object-fit:cover;
+border-radius:10px;
+background:#1c1f28
+}
+.content{
+flex:1
+}
+h1{
+font-size:32px;
+margin-top:0
+}
+.description{
+color:#bbb;
+line-height:1.6
+}
+.tags{
+display:flex;
+flex-wrap:wrap;
+gap:8px;
+margin:15px 0
+}
+.tag{
+background:#20232d;
+padding:7px 11px;
+border-radius:20px;
+font-size:13px
+}
+.watch{
+display:inline-block;
+background:#ff3f91;
+color:white;
+padding:13px 22px;
+border-radius:8px;
+text-decoration:none;
+margin-top:10px;
+font-weight:bold
+}
+.info{
+color:#aaa;
+line-height:1.7
+}
+.loading{
+color:#aaa;
+font-size:18px
+}
+.error{
+color:#ff6b9f
+}
+@media(max-width:650px){
+.hero{
+flex-direction:column
+}
+.poster{
+width:180px;
+height:260px
+}
+h1{
+font-size:25px
+}
+}
 </style>
 </head>
+
 <body>
-<header><div class="logo">DIXORINO</div><a href="/">Home</a></header>
+
+<header>
+<div class="logo">DIXORINO</div>
+<a href="/">Home</a>
+</header>
+
 <main>
-<a class="back" href="/">← Back to DIXORINO</a>
-<div class="box">
-<img id="poster" class="poster">
-<h1 id="title"></h1>
-<p>A young warrior begins a dangerous journey filled with adventure and powerful enemies.</p>
-<div class="tags"><span class="tag">Action</span><span class="tag">Adventure</span><span class="tag">HD</span></div>
+
+<a class="back" href="/">← Back to Home</a>
+
+<div id="status" class="loading">
+Loading anime...
 </div>
-<h2>Episodes</h2>
-<div id="episodes" class="grid"></div>
+
+<div id="anime" style="display:none"></div>
+
 </main>
+
 <script>
-const name=new URLSearchParams(location.search).get("anime")||"Demon Slayer";
-title.textContent=name;
-poster.src="https://placehold.co/300x420/171923/ff3d91?text="+encodeURIComponent(name);
-let h="";
-for(let i=1;i<=12;i++)h+=`<a class="ep" href="watch.html?anime=${encodeURIComponent(name)}&episode=${i}">Episode ${i}</a>`;
-episodes.innerHTML=h;
+
+const params=new URLSearchParams(location.search);
+const id=params.get("id");
+
+const status=document.getElementById("status");
+const box=document.getElementById("anime");
+
+if(!id){
+
+status.textContent="No anime selected.";
+}else{
+
+loadAnime(id);
+
+}
+
+async function loadAnime(id){
+
+try{
+
+const response=await fetch(
+"https://api.jikan.moe/v4/anime/"+id
+);
+
+const result=await response.json();
+const a=result.data;
+
+if(!a){
+throw new Error("Anime not found");
+}
+
+document.title=
+"DIXORINO - "+a.title;
+
+const image=
+a.images?.jpg?.large_image_url ||
+a.images?.jpg?.image_url ||
+"";
+
+const genres=
+(a.genres||[])
+.map(g=>`<span class="tag">${g.name}</span>`)
+.join("");
+
+const studios=
+(a.studios||[])
+.map(s=>s.name)
+.join(", ") || "Unknown";
+
+const score=
+a.score ?? "N/A";
+
+const episodes=
+a.episodes ?? "Unknown";
+
+const synopsis=
+a.synopsis ||
+"No description available.";
+
+box.innerHTML=`
+
+<div class="hero">
+
+<img
+class="poster"
+src="${image}"
+alt="${escapeHtml(a.title)}"
+>
+
+<div class="content">
+
+<h1>${escapeHtml(a.title)}</h1>
+
+<div class="tags">
+${genres}
+</div>
+
+<p class="description">
+${escapeHtml(synopsis)}
+</p>
+
+<div class="info">
+
+<b>⭐ Score:</b> ${score}<br>
+<b>📺 Episodes:</b> ${episodes}<br>
+<b>🎬 Type:</b> ${a.type||"Unknown"}<br>
+<b>🏢 Studio:</b> ${escapeHtml(studios)}<br>
+<b>📅 Status:</b> ${a.status||"Unknown"}
+
+</div>
+
+<a class="watch"
+href="watch.html?anime=${encodeURIComponent(a.title)}&episode=1">
+▶ Watch Episode 1
+</a>
+
+</div>
+
+</div>
+`;
+
+status.style.display="none";
+box.style.display="block";
+
+}catch(error){
+
+console.error(error);
+
+status.className="error";
+status.textContent=
+"Couldn't load this anime. Try again.";
+
+}
+
+}
+
+function escapeHtml(text){
+
+return String(text)
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
+
+}
+
 </script>
+
 </body>
 </html>
