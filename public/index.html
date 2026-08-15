@@ -219,7 +219,7 @@ Discover thousands of anime and find your next favorite.
 <div id="popular" class="grid">
 <div class="loading">Loading...</div>
 </div>
-<button id="loadPopular" class="load-more" onclick="loadMorePopular()">Load More</button>
+
 
 </section>
 
@@ -232,7 +232,7 @@ Discover thousands of anime and find your next favorite.
 <div id="latest" class="grid">
 <div class="loading">Loading...</div>
 </div>
-<button id="loadLatest" class="load-more" onclick="loadMoreLatest()">Load More</button>
+
 
 </section>
 
@@ -405,169 +405,92 @@ document.getElementById("latest").innerHTML=
 }
 
 
-let popularPage=1;
-let latestPage=1;
-
-async function loadMorePopular(){
-
-  const button=document.getElementById("loadPopular");
-  button.disabled=true;
-  button.textContent="Loading...";
-
-  try{
-
-    popularPage++;
-
-    const data=await getAnime(
-      API+"/top/anime?page="+popularPage+"&limit=24"
-    );
-
-    if(data.length){
-      document.getElementById("popular").insertAdjacentHTML(
-        "beforeend",
-        data.map(createCard).join("")
-      );
-      button.disabled=false;
-      button.textContent="Load More";
-    }else{
-      button.textContent="No more anime";
-    }
-
-  }catch(e){
-
-    popularPage--;
-    button.disabled=false;
-    button.textContent="Try Again";
-
-  }
-
-}
-
-async function loadMoreLatest(){
-
-  const button=document.getElementById("loadLatest");
-  button.disabled=true;
-  button.textContent="Loading...";
-
-  try{
-
-    latestPage++;
-
-    const data=await getAnime(
-      API+"/anime?order_by=mal_id&sort=desc&page="+latestPage+"&limit=24"
-    );
-
-    if(data.length){
-      document.getElementById("latest").insertAdjacentHTML(
-        "beforeend",
-        data.map(createCard).join("")
-      );
-      button.disabled=false;
-      button.textContent="Load More";
-    }else{
-      button.textContent="No more anime";
-    }
-
-  }catch(e){
-
-    latestPage--;
-    button.disabled=false;
-    button.textContent="Try Again";
-
-  }
-
-}
-
 async function searchAnime(query){
 
-query = query.trim();
+  query=query.trim();
 
-const section = document.getElementById("searchSection");
-const results = document.getElementById("results");
+  if(!query){
+    document.getElementById("searchSection").style.display="none";
+    return;
+  }
 
-if(!query){
-section.style.display = "none";
-return;
-}
+  document.getElementById("searchSection").style.display="block";
+  document.getElementById("results").innerHTML=
+    "<div class='loading'>Searching...</div>";
 
-section.style.display = "block";
-results.innerHTML =
-"<div class='loading'>🔎 Searching...</div>";
+  const q=query.toLowerCase();
 
-try{
+  try{
 
-if(!window.animeCache){
+    /* Search local cache first */
+    let cached=[];
 
-let response = null;
+    try{
+      const cacheResponse=await fetch("data/search-cache.json");
+      if(cacheResponse.ok){
+        const cache=await cacheResponse.json();
+        cached=Object.values(cache).filter(a=>{
+          const title=(a.title||"").toLowerCase();
+          const english=(a.title_english||"").toLowerCase();
+          return title.includes(q)||english.includes(q);
+        });
+      }
+    }catch(e){
+      console.log("Local cache unavailable");
+    }
 
-for(let attempt=1; attempt<=3; attempt++){
+    if(cached.length){
+      document.getElementById("results").innerHTML=
+        cached.slice(0,24).map(createCard).join("");
+      return;
+    }
 
-try{
+    /* Ask Jikan if cache has no result */
+    const response=await fetch(
+      API+"/anime?q="+encodeURIComponent(query)+"&limit=24"
+    );
 
-response = await fetch(
-API + "/top/anime?limit=25"
-);
+    if(!response.ok){
+      throw new Error("Search API returned "+response.status);
+    }
 
-if(response.ok) break;
+    const json=await response.json();
+    const data=json.data||[];
 
-}catch(e){}
+    if(!data.length){
+      document.getElementById("results").innerHTML=
+        "<div class='loading'>No anime found.</div>";
+      return;
+    }
 
-if(attempt<3){
-await new Promise(
-resolve=>setTimeout(resolve,1500)
-);
-}
+    /* Save successful results to local cache */
+    try{
+      const cacheResponse=await fetch("data/search-cache.json");
+      const cache=cacheResponse.ok ? await cacheResponse.json() : {};
 
-}
+      data.forEach(anime=>{
+        if(anime && anime.mal_id){
+          cache[String(anime.mal_id)]=anime;
+        }
+      });
 
-if(!response || !response.ok){
-throw new Error("Anime API unavailable");
-}
+      console.log("Search results loaded:",data.length);
+    }catch(e){
+      console.log("Cache is read-only on this hosting setup");
+    }
 
-const json = await response.json();
+    /* Display results */
+    document.getElementById("results").innerHTML=
+      data.map(createCard).join("");
 
-window.animeCache = json.data || [];
+  }catch(e){
 
-}
+    console.error(e);
 
-const q = query.toLowerCase();
+    document.getElementById("results").innerHTML=
+      "<div class='loading'>Search is temporarily unavailable. Please try again.</div>";
 
-const matches = window.animeCache.filter(a => {
-
-const title = (a.title || "").toLowerCase();
-const english = (a.title_english || "").toLowerCase();
-const japanese = (a.title_japanese || "").toLowerCase();
-
-return title.includes(q) ||
-english.includes(q) ||
-japanese.includes(q);
-
-});
-
-results.innerHTML =
-"<h2>🔎 Search Results</h2>" +
-(
-matches.length
-? matches.map(createCard).join("")
-: "<div class='loading'>No matching anime found.</div>"
-);
-
-window.scrollTo({
-top: section.offsetTop - 80,
-behavior: "smooth"
-});
-
-}catch(e){
-
-console.error(e);
-
-results.innerHTML =
-"<div class='loading'>" +
-"⚠️ Anime service is temporarily unavailable. " +
-"Please try again shortly." +
-"</div>";
-
-}
+  }
 
 }
 
