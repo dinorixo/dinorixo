@@ -4,28 +4,188 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>DIXORINO - Watch</title>
+
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#08090d;color:#fff;font-family:Arial,sans-serif}
-header{height:70px;background:#10121a;display:flex;align-items:center;padding:0 20px;gap:25px}
-.logo{font-size:27px;font-weight:900;color:#ff3f91}
-header a{color:#fff;text-decoration:none}
-main{max-width:1100px;margin:auto;padding:20px}
-.back{color:#ff3f91;text-decoration:none}
-.player{margin-top:20px;background:#000;border-radius:12px;overflow:hidden;aspect-ratio:16/9}
-video{width:100%;height:100%;display:block}
-h1{margin-bottom:5px}
-.muted{color:#999}
-.controls{display:flex;gap:10px;margin:20px 0;flex-wrap:wrap}
-.control{background:#191c26;color:#fff;padding:12px 18px;border-radius:8px;text-decoration:none}
-.control:hover{background:#ff3f91}
-.episodes{display:grid;grid-template-columns:repeat(6,1fr);gap:9px}
-.ep{background:#191c26;color:#fff;border:0;padding:13px;border-radius:7px}
-.ep:hover,.ep.active{background:#ff3f91}
-.notice{margin-top:20px;padding:15px;background:#151821;border-radius:10px;color:#aaa}
-@media(max-width:600px){
-main{padding:15px}
-.episodes{grid-template-columns:repeat(3,1fr)}
+
+body{
+margin:0;
+background:#08090d;
+color:#fff;
+font-family:Arial,sans-serif
+}
+
+header{
+height:70px;
+background:#10121a;
+display:flex;
+align-items:center;
+padding:0 20px;
+gap:25px;
+position:sticky;
+top:0;
+z-index:10
+}
+
+.logo{
+font-size:27px;
+font-weight:900;
+color:#ff3f91
+}
+
+header a{
+color:#fff;
+text-decoration:none
+}
+
+main{
+max-width:1100px;
+margin:auto;
+padding:20px
+}
+
+.back{
+color:#ff3f91;
+text-decoration:none;
+display:inline-block;
+margin-bottom:15px
+}
+
+.player-wrap{
+position:relative;
+background:#000;
+border-radius:14px;
+overflow:hidden;
+box-shadow:0 10px 35px rgba(0,0,0,.35)
+}
+
+video{
+width:100%;
+display:block;
+aspect-ratio:16/9;
+background:#000
+}
+
+.player-status{
+position:absolute;
+left:15px;
+bottom:15px;
+background:rgba(0,0,0,.7);
+padding:8px 12px;
+border-radius:7px;
+font-size:13px;
+color:#bbb;
+pointer-events:none
+}
+
+h1{
+font-size:27px;
+margin:20px 0 5px
+}
+
+.muted{
+color:#999
+}
+
+.controls{
+display:flex;
+gap:10px;
+margin:20px 0;
+flex-wrap:wrap
+}
+
+.control{
+background:#191c26;
+color:#fff;
+padding:12px 18px;
+border-radius:8px;
+text-decoration:none;
+border:0;
+cursor:pointer;
+font-size:14px
+}
+
+.control:hover{
+background:#ff3f91
+}
+
+.control.disabled{
+opacity:.4;
+pointer-events:none
+}
+
+.progress{
+height:4px;
+background:#242733;
+border-radius:5px;
+margin-top:12px;
+overflow:hidden
+}
+
+.progress-bar{
+height:100%;
+width:0%;
+background:#ff3f91;
+transition:width .2s
+}
+
+.episodes{
+display:grid;
+grid-template-columns:repeat(6,1fr);
+gap:9px;
+margin-top:15px
+}
+
+.ep{
+background:#191c26;
+color:#fff;
+border:0;
+padding:13px 7px;
+border-radius:7px;
+cursor:pointer
+}
+
+.ep:hover,
+.ep.active{
+background:#ff3f91
+}
+
+.notice{
+margin-top:25px;
+padding:15px;
+background:#151821;
+border-radius:10px;
+color:#999;
+font-size:13px;
+line-height:1.5
+}
+
+@media(max-width:700px){
+
+main{
+padding:15px
+}
+
+header{
+padding:0 15px
+}
+
+.logo{
+font-size:23px
+}
+
+h1{
+font-size:23px
+}
+
+.episodes{
+grid-template-columns:repeat(3,1fr)
+}
+
+.ep{
+padding:12px 5px
+}
+
 }
 </style>
 </head>
@@ -34,32 +194,64 @@ main{padding:15px}
 
 <header>
 <div class="logo">DIXORINO</div>
-<a id="home" href="/">Home</a>
+<a href="/">Home</a>
 </header>
 
 <main>
 
 <a class="back" id="back">← Back to Anime</a>
 
-<div class="player">
-<video id="player" controls playsinline>
-<source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4">
+<div class="player-wrap">
+
+<video
+id="player"
+controls
+playsinline
+preload="metadata">
+
+<source
+src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+type="video/mp4">
+
+Your browser does not support video playback.
+
 </video>
+
+<div class="player-status" id="playerStatus">
+Ready
+</div>
+
+</div>
+
+<div class="progress">
+<div class="progress-bar" id="progressBar"></div>
 </div>
 
 <h1 id="title">Loading...</h1>
-<div class="muted" id="episode"></div>
+
+<div class="muted" id="episode">
+Episode 1
+</div>
 
 <div class="controls">
-<a class="control" id="previous">← Previous</a>
-<a class="control" id="next">Next →</a>
+
+<a class="control" id="previous">
+← Previous
+</a>
+
+<a class="control" id="next">
+Next →
+</a>
+
 </div>
 
 <h2>Episodes</h2>
+
 <div class="episodes" id="episodes"></div>
 
 <div class="notice">
-Demo player. Only use video content that you own or are authorized to stream.
+This player is configured for video content that you own or are authorized to stream.
+Demo video is currently being used as the playback source.
 </div>
 
 </main>
@@ -71,7 +263,14 @@ const params=new URLSearchParams(location.search);
 const anime=params.get("anime")||"Anime";
 const id=params.get("id")||"";
 const episode=Number(params.get("episode"))||1;
-const total=Number(params.get("total"))||12;
+const total=Math.max(
+1,
+Number(params.get("total"))||12
+);
+
+const player=document.getElementById("player");
+const status=document.getElementById("playerStatus");
+const progressBar=document.getElementById("progressBar");
 
 document.title="DIXORINO - "+anime;
 
@@ -81,7 +280,9 @@ document.getElementById("episode").textContent=
 "Episode "+episode;
 
 document.getElementById("back").href=
-id ? "details.html?id="+id : "/";
+id
+?"details.html?id="+encodeURIComponent(id)
+:"/";
 
 function watchURL(ep){
 
@@ -93,33 +294,49 @@ encodeURIComponent(anime)+
 
 }
 
-const previous=document.getElementById("previous");
-const next=document.getElementById("next");
+const previous=
+document.getElementById("previous");
+
+const next=
+document.getElementById("next");
 
 if(episode>1){
-previous.href=watchURL(episode-1);
+
+previous.href=
+watchURL(episode-1);
+
 }else{
-previous.style.opacity=".4";
-previous.style.pointerEvents="none";
+
+previous.classList.add("disabled");
+
 }
 
 if(episode<total){
-next.href=watchURL(episode+1);
+
+next.href=
+watchURL(episode+1);
+
 }else{
-next.style.opacity=".4";
-next.style.pointerEvents="none";
+
+next.classList.add("disabled");
+
 }
 
-const box=document.getElementById("episodes");
+/* Episode buttons */
+
+const box=
+document.getElementById("episodes");
 
 for(let i=1;i<=total;i++){
 
-const button=document.createElement("button");
+const button=
+document.createElement("button");
 
-button.className="ep"+
-(i===episode?" active":"");
+button.className=
+"ep"+(i===episode?" active":"");
 
-button.textContent="Episode "+i;
+button.textContent=
+"Episode "+i;
 
 button.onclick=()=>{
 location.href=watchURL(i);
@@ -129,14 +346,184 @@ box.appendChild(button);
 
 }
 
+/* Progress storage */
+
+const progressKey=
+"dixorinoProgress_"+(id||anime)+"_"+episode;
+
+const savedPosition=
+Number(
+localStorage.getItem(progressKey)||0
+);
+
+/* Save Continue Watching */
+
+function saveContinue(){
+
 localStorage.setItem(
 "dixorinoLastWatched",
 JSON.stringify({
 anime:anime,
 episode:episode,
-id:id
+id:id,
+total:total,
+time:player.currentTime||0
 })
 );
+
+}
+
+/* Restore playback position */
+
+player.addEventListener("loadedmetadata",()=>{
+
+if(
+savedPosition>0 &&
+savedPosition<player.duration-5
+){
+
+player.currentTime=
+savedPosition;
+
+status.textContent=
+"Resumed from "+formatTime(savedPosition);
+
+}else{
+
+status.textContent="Ready";
+
+}
+
+});
+
+/* Update progress */
+
+player.addEventListener("timeupdate",()=>{
+
+if(!player.duration)return;
+
+const percent=
+(player.currentTime/player.duration)*100;
+
+progressBar.style.width=
+percent+"%";
+
+localStorage.setItem(
+progressKey,
+String(player.currentTime)
+);
+
+saveContinue();
+
+});
+
+/* Playback status */
+
+player.addEventListener("play",()=>{
+
+status.textContent="Playing";
+
+});
+
+player.addEventListener("pause",()=>{
+
+if(!player.ended){
+status.textContent="Paused";
+}
+
+saveContinue();
+
+});
+
+player.addEventListener("waiting",()=>{
+
+status.textContent="Buffering...";
+
+});
+
+player.addEventListener("canplay",()=>{
+
+if(!player.paused){
+status.textContent="Playing";
+}else{
+status.textContent="Ready";
+}
+
+});
+
+player.addEventListener("ended",()=>{
+
+status.textContent="Finished";
+
+progressBar.style.width="100%";
+
+saveContinue();
+
+});
+
+/* Error handling */
+
+player.addEventListener("error",()=>{
+
+status.textContent=
+"Video could not be loaded.";
+
+});
+
+/* Format time */
+
+function formatTime(seconds){
+
+seconds=Math.floor(seconds);
+
+const minutes=
+Math.floor(seconds/60);
+
+const secs=
+String(seconds%60).padStart(2,"0");
+
+return minutes+":"+secs;
+
+}
+
+/* Keyboard shortcuts */
+
+document.addEventListener("keydown",e=>{
+
+if(
+e.target.tagName==="INPUT" ||
+e.target.tagName==="TEXTAREA"
+)return;
+
+if(e.code==="Space"){
+
+e.preventDefault();
+
+if(player.paused){
+player.play();
+}else{
+player.pause();
+}
+
+}
+
+if(e.key==="ArrowRight"){
+
+player.currentTime+=5;
+
+}
+
+if(e.key==="ArrowLeft"){
+
+player.currentTime-=5;
+
+}
+
+});
+
+/* Save before leaving */
+
+window.addEventListener("beforeunload",saveContinue);
 
 </script>
 
