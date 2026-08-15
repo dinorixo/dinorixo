@@ -47,7 +47,9 @@ export default {
         const response = await fetch(ANILIST, {
           method: "POST",
           headers: {
-            "content-type": "application/json"
+            "content-type": "application/json",
+            "accept": "application/json",
+            "user-agent": "DIXORINO/1.0"
           },
           body: JSON.stringify({
             query,
