@@ -536,22 +536,38 @@ async function openGenre(id,name){
     "<div class='loading'>Loading "+name+" anime...</div>";
 
   try{
-    const response = await fetch(API+"/top/anime?limit=25");
+    let matches = [];
 
-    if(!response.ok) throw new Error("API error");
+    for(let page=1; page<=5 && matches.length<12; page++){
 
-    const json = await response.json();
-    const all = json.data || [];
+      const response = await fetch(
+        API+"/top/anime?page="+page+"&limit=25"
+      );
 
-    const data = all.filter(anime =>
-      (anime.genres || []).some(g => Number(g.mal_id) === Number(id))
-    );
+      if(!response.ok) throw new Error("API error");
+
+      const json = await response.json();
+
+      const found = (json.data || []).filter(anime =>
+        (anime.genres || []).some(g =>
+          Number(g.mal_id) === Number(id)
+        )
+      );
+
+      matches.push(...found);
+
+      if((json.data || []).length === 0) break;
+
+      await new Promise(resolve => setTimeout(resolve,400));
+    }
+
+    matches = matches.slice(0,12);
 
     document.getElementById("results").innerHTML =
       "<h2>"+name+" Anime</h2>" +
-      (data.length
-        ? data.map(createCard).join("")
-        : "<div class='loading'>No "+name+" anime found in the current list.</div>");
+      (matches.length
+        ? matches.map(createCard).join("")
+        : "<div class='loading'>No "+name+" anime found.</div>");
 
     window.scrollTo({
       top: document.getElementById("searchSection").offsetTop-80,
@@ -564,7 +580,6 @@ async function openGenre(id,name){
       "<div class='loading'>Could not load "+name+" anime right now.</div>";
   }
 }
-
 
 let timer;
 
