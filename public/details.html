@@ -3,34 +3,40 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>DIXORINO</title>
+<title>DIXORINO - Anime</title>
+
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#08090d;color:#fff;font-family:Arial,sans-serif}
-header{height:70px;background:#10121a;display:flex;align-items:center;padding:0 20px}
+header{height:70px;background:#10121a;display:flex;align-items:center;padding:0 20px;gap:25px}
 .logo{font-size:27px;font-weight:900;color:#ff3f91}
-header a{color:#fff;text-decoration:none;margin-left:25px}
-main{max-width:1100px;margin:auto;padding:20px}
+header a{color:#fff;text-decoration:none}
+main{max-width:1150px;margin:auto;padding:20px}
 .back{color:#ff3f91;text-decoration:none}
-.hero{display:flex;gap:30px;margin-top:25px;background:#12151d;padding:25px;border-radius:16px}
-.poster{width:230px;height:330px;object-fit:cover;border-radius:10px}
+.hero{display:flex;gap:30px;margin-top:25px;padding:25px;background:#12151d;border-radius:16px}
+.poster{width:240px;height:350px;object-fit:cover;border-radius:10px}
 .content{flex:1}
-h1{font-size:32px;margin-top:0}
-.description{color:#bbb;line-height:1.6}
-.tags{display:flex;flex-wrap:wrap;gap:8px}
+h1{font-size:34px;margin:0 0 12px}
+.description{color:#bbb;line-height:1.7}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin:15px 0}
 .tag{background:#20232d;padding:7px 11px;border-radius:20px;font-size:13px}
-.info{color:#aaa;line-height:1.8;margin-top:15px}
-.episodes{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-top:15px}
-.ep{background:#191c26;color:#fff;border:0;border-radius:7px;padding:13px}
+.info{color:#aaa;line-height:1.8}
+.favorite{margin-top:18px;background:#ff3f91;color:white;border:0;padding:12px 18px;border-radius:8px;font-weight:bold}
+.trailer{margin-top:30px}
+.trailer iframe{width:100%;aspect-ratio:16/9;border:0;border-radius:12px}
+.episodes{display:grid;grid-template-columns:repeat(6,1fr);gap:9px;margin-top:15px}
+.ep{background:#191c26;color:white;border:0;padding:13px;border-radius:7px}
 .ep:hover{background:#ff3f91}
-@media(max-width:650px){
+.loading{color:#888}
+@media(max-width:700px){
 .hero{flex-direction:column}
-.poster{width:180px;height:260px}
+.poster{width:190px;height:280px}
+h1{font-size:27px}
 .episodes{grid-template-columns:repeat(3,1fr)}
-h1{font-size:25px}
 }
 </style>
 </head>
+
 <body>
 
 <header>
@@ -39,17 +45,22 @@ h1{font-size:25px}
 </header>
 
 <main>
+
 <a class="back" href="/">← Home</a>
 
-<div id="status">Loading...</div>
+<div id="status" class="loading">Loading...</div>
 <div id="anime"></div>
+
 </main>
 
 <script>
 
 const id=new URLSearchParams(location.search).get("id");
+const API="https://api.jikan.moe/v4";
 
-async function load(){
+let animeData=null;
+
+async function loadAnime(){
 
 if(!id){
 document.getElementById("status").textContent="Anime not selected.";
@@ -58,17 +69,22 @@ return;
 
 try{
 
-const r=await fetch("https://api.jikan.moe/v4/anime/"+id);
+const r=await fetch(API+"/anime/"+id);
 const x=await r.json();
-const a=x.data;
+
+animeData=x.data;
+
+const a=animeData;
 
 document.title="DIXORINO - "+a.title;
 
 const genres=(a.genres||[])
-.map(g=>`<span class="tag">${g.name}</span>`).join("");
+.map(g=>`<span class="tag">${safe(g.name)}</span>`)
+.join("");
 
 const studios=(a.studios||[])
-.map(s=>s.name).join(", ")||"Unknown";
+.map(s=>safe(s.name))
+.join(", ")||"Unknown";
 
 document.getElementById("status").style.display="none";
 
@@ -77,7 +93,8 @@ document.getElementById("anime").innerHTML=`
 <div class="hero">
 
 <img class="poster"
-src="${a.images?.jpg?.large_image_url||""}">
+src="${a.images?.jpg?.large_image_url||""}"
+alt="${safe(a.title)}">
 
 <div class="content">
 
@@ -91,28 +108,71 @@ ${safe(a.synopsis||"No description available.")}
 
 <div class="info">
 ⭐ Score: ${a.score||"N/A"}<br>
+🏆 Rank: ${a.rank ? "#"+a.rank : "N/A"}<br>
 📺 Episodes: ${a.episodes||"Unknown"}<br>
-🎬 Type: ${a.type||"Unknown"}<br>
-🏢 Studio: ${safe(studios)}<br>
-📅 Status: ${a.status||"Unknown"}
+🎬 Type: ${safe(a.type||"Unknown")}<br>
+🏢 Studio: ${studios}<br>
+📅 Status: ${safe(a.status||"Unknown")}<br>
+⭐ Rating: ${safe(a.rating||"Not rated")}
 </div>
+
+<button class="favorite" id="fav">
+♡ Add to Favorites
+</button>
 
 </div>
 </div>
+
+<div class="trailer" id="trailer"></div>
 
 <h2>Episodes</h2>
 
 <div class="episodes" id="episodes">
-Loading episodes...
+<div class="loading">Loading episodes...</div>
 </div>
 `;
 
+setupFavorite();
+loadTrailer();
 loadEpisodes();
 
 }catch(e){
 
+console.error(e);
 document.getElementById("status").textContent=
-"Could not load anime.";
+"Could not load this anime.";
+
+}
+
+}
+
+async function loadTrailer(){
+
+try{
+
+const r=await fetch(API+"/anime/"+id+"/videos");
+const x=await r.json();
+
+const promo=x.data?.promo?.[0] ||
+            x.data?.promos?.[0];
+
+if(promo?.trailer?.embed_url){
+
+document.getElementById("trailer").innerHTML=`
+
+<h2>🎬 Trailer</h2>
+
+<iframe
+src="${promo.trailer.embed_url}"
+allowfullscreen>
+</iframe>
+`;
+
+}
+
+}catch(e){
+
+console.log("No trailer available");
 
 }
 
@@ -120,26 +180,26 @@ document.getElementById("status").textContent=
 
 async function loadEpisodes(){
 
-const box=document.getElementById("episodes");
-
 try{
 
-const r=await fetch(
-"https://api.jikan.moe/v4/anime/"+id+"/episodes"
-);
-
+const r=await fetch(API+"/anime/"+id+"/episodes");
 const x=await r.json();
 
-if(!x.data||!x.data.length){
+const episodes=x.data||[];
+const box=document.getElementById("episodes");
 
-box.innerHTML="<p>No episode information available.</p>";
+if(!episodes.length){
+
+box.innerHTML=
+"<div class='loading'>No episode information available.</div>";
 return;
+
 }
 
-box.innerHTML=x.data.map(ep=>`
+box.innerHTML=episodes.map(ep=>`
 
 <button class="ep"
-onclick="watch(${ep.mal_id},${ep.mal_id})">
+onclick="openEpisode(${ep.mal_id},${ep.mal_id})">
 Episode ${ep.mal_id}
 </button>
 
@@ -147,33 +207,84 @@ Episode ${ep.mal_id}
 
 }catch(e){
 
-box.innerHTML=
-"<p>Episode information unavailable.</p>";
+document.getElementById("episodes").innerHTML=
+"<div class='loading'>Episode information unavailable.</div>";
 
 }
 
 }
 
-function watch(number){
+function openEpisode(number){
 
 location.href=
 "watch.html?anime="+
-encodeURIComponent(document.title.replace("DIXORINO - ",""))+
-"&episode="+number;
+encodeURIComponent(animeData.title)+
+"&episode="+number+
+"&id="+id+
+"&total="+(animeData.episodes||12);
 
 }
 
-function safe(t){
+function setupFavorite(){
 
-return String(t)
+const button=document.getElementById("fav");
+
+let favorites=
+JSON.parse(
+localStorage.getItem("dixorinoFavorites")||"[]"
+);
+
+function update(){
+
+const saved=favorites.includes(Number(id));
+
+button.textContent=
+saved
+?"♥ Remove from Favorites"
+:"♡ Add to Favorites";
+
+}
+
+button.onclick=()=>{
+
+const num=Number(id);
+
+if(favorites.includes(num)){
+
+favorites=
+favorites.filter(x=>x!==num);
+
+}else{
+
+favorites.push(num);
+
+}
+
+localStorage.setItem(
+"dixorinoFavorites",
+JSON.stringify(favorites)
+);
+
+update();
+
+};
+
+update();
+
+}
+
+function safe(text){
+
+return String(text)
 .replace(/&/g,"&amp;")
 .replace(/</g,"&lt;")
 .replace(/>/g,"&gt;")
-.replace(/"/g,"&quot;");
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
 
 }
 
-load();
+loadAnime();
 
 </script>
 
