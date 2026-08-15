@@ -34,44 +34,48 @@ body{background:radial-gradient(circle at 15% 0%,rgba(255,63,145,.10),transparen
 </main>
 <script>
 const params = new URLSearchParams(location.search);
-let id = params.get("id");
+let initialId = params.get("id");
 
 async function loadDetails() {
-  if (!id) return;
+  if (!initialId) return;
+  const grid = document.getElementById("episode-grid");
+  
   try {
-    const grid = document.getElementById("episode-grid");
+    document.getElementById("anime-title").textContent = "Resolving database paths...";
     
-    // 1. Try loading episodes assuming the ID is an AniList ID
-    let epRes = await fetch(`/api/episodes?id=${id}`);
-    let epData = await epRes.json();
-    let episodeList = epData.episodes || [];
-
-    // 2. If it is empty, search by title map to resolve the ID automatically
-    if (episodeList.length === 0) {
-      document.getElementById("anime-title").textContent = "Resolving database paths...";
-      const searchRes = await fetch(`/api/search?q=${id}`);
-      const searchData = await searchRes.json();
-      if (searchData.data && searchData.data.length > 0) {
-        id = searchData.data[0].mal_id; // FIX: Select the first matching element array item
-        epRes = await fetch(`/api/episodes?id=${id}`);
-        epData = await epRes.json();
-        episodeList = epData.episodes || [];
-      }
+    // Step 1: Use your search API to turn the ID or text into a clean AniList data entry
+    const searchRes = await fetch(`/api/search?q=${encodeURIComponent(initialId)}`);
+    const searchData = await searchRes.json();
+    
+    if (!searchData.data || searchData.data.length === 0) {
+      grid.innerHTML = "<p style='color: #ff3f91;'>Could not match this anime title in the database.</p>";
+      return;
     }
-
-    const animeTitle = "Dixorino Player Canvas";
+    
+    // Grab the first search result item found
+    const foundAnime = searchData.data[0];
+    const finalId = foundAnime.mal_id; 
+    const animeTitle = foundAnime.title || "Dixorino Player Canvas";
+    
     document.getElementById("anime-title").textContent = animeTitle;
+
+    // Step 2: Get the episode tracks list using the correct matched ID
+    const epRes = await fetch(`/api/episodes?id=${finalId}`);
+    const epData = await epRes.json();
+    const episodeList = epData.episodes || [];
+
     grid.innerHTML = "";
 
     if (episodeList.length === 0) {
-      grid.innerHTML = "<p style='color: #ff3f91;'>Notice: This specific title is currently restricted or undergoing server maintenance on HiAnime providers. Try searching another popular anime like 'Naruto' or 'One Piece'!</p>";
+      grid.innerHTML = "<p style='color: #ff3f91;'>Notice: No streamable episodes found for this layout context on HiAnime providers yet.</p>";
       return;
     }
 
+    // Step 3: Render out the buttons cleanly
     episodeList.forEach((ep) => {
       const link = document.createElement("a");
       link.className = "ep-btn";
-      link.href = `watch.html?id=${id}&episode=${ep.number}&anime=${encodeURIComponent(animeTitle)}`;
+      link.href = `watch.html?id=${finalId}&episode=${ep.number}&anime=${encodeURIComponent(animeTitle)}`;
       link.innerHTML = `
         <span class="ep-num">Episode ${ep.number}</span>
         <span class="ep-src">Player Stream</span>
@@ -80,7 +84,7 @@ async function loadDetails() {
     });
   } catch(e) {
     console.error(e);
-    document.getElementById("anime-title").textContent = "Streaming server communication issue.";
+    grid.innerHTML = "<p style='color: #ff3f91;'>Streaming server communication error.</p>";
   }
 }
 loadDetails();
