@@ -13,7 +13,7 @@ header a{color:#fff;text-decoration:none}
 main{max-width:1100px;margin:auto;padding:20px}
 .back{color:#ff3f91;text-decoration:none;display:inline-block;margin-bottom:15px}
 h1{font-size:32px;margin:0 0 10px}
-.episodes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px}
+.episodes{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:20px}
 .ep-btn{background:#14141e;border:1px solid rgba(255,255,255,.08);color:#fff;padding:15px;border-radius:12px;cursor:pointer;text-align:center;text-decoration:none;display:block;transition:.2s;}
 .ep-btn:hover{background:linear-gradient(90deg,#ff3f91,#9b5cff);transform:translateY(-2px);}
 .ep-num{font-weight:bold;font-size:16px;display:block;margin-bottom:4px;}
@@ -28,40 +28,51 @@ body{background:radial-gradient(circle at 15% 0%,rgba(255,63,145,.10),transparen
 <header><div class="logo">DIXORINO</div><a href="/">Home</a></header>
 <main>
 <a class="back" href="/">← Back Home</a>
-<h1 id="anime-title">Loading Details...</h1>
+<h1 id="anime-title">Loading Streaming Tracks...</h1>
 <h2>Episodes</h2>
 <div class="episodes" id="episode-grid"></div>
 </main>
 <script>
 const params = new URLSearchParams(location.search);
-const id = params.get("id");
+let id = params.get("id");
 
 async function loadDetails() {
   if (!id) return;
   try {
-    // Fetch info to get the proper Title string context mapping
-    const epRes = await fetch(`/api/episodes?id=${id}`);
-    const epData = await epRes.json();
-    const episodeList = epData.episodes || [];
-    
-    // We can extract an approximate clean name string from list items or fallback defaults
-    const animeTitle = "Dixorino Anime Stream";
-    document.getElementById("anime-title").textContent = animeTitle;
-
     const grid = document.getElementById("episode-grid");
+    
+    // First, try loading episodes assuming the ID is an AniList ID
+    let epRes = await fetch(`/api/episodes?id=${id}`);
+    let epData = await epRes.json();
+    let episodeList = epData.episodes || [];
+
+    // Fallback: If it returns empty, try searching the title mapping 
+    if (episodeList.length === 0) {
+      document.getElementById("anime-title").textContent = "Resolving database paths...";
+      // We search the AniList API internally using our query ID string to find the exact target match
+      const searchRes = await fetch(`/api/search?q=${id}`);
+      const searchData = await searchRes.json();
+      if (searchData.data && searchData.data.length > 0) {
+        id = searchData.data[0].mal_id; // Remap the active routing parameter
+        epRes = await fetch(`/api/episodes?id=${id}`);
+        epData = await epRes.json();
+        episodeList = epData.episodes || [];
+      }
+    }
+
+    const animeTitle = "Dixorino Player Canvas";
+    document.getElementById("anime-title").textContent = animeTitle;
     grid.innerHTML = "";
 
     if (episodeList.length === 0) {
-      grid.innerHTML = "<p>No streamable episodes parsed for this layout context yet.</p>";
+      grid.innerHTML = "<p style='color: #ff3f91;'>Notice: This specific title is currently restricted or undergoing server maintenance on HiAnime providers. Try searching another popular anime like 'Naruto' or 'One Piece'!</p>";
       return;
     }
 
     episodeList.forEach((ep) => {
       const link = document.createElement("a");
       link.className = "ep-btn";
-      // This routes directly to your native inside player layout watch.html file instead of Crunchyroll!
       link.href = `watch.html?id=${id}&episode=${ep.number}&anime=${encodeURIComponent(animeTitle)}`;
-      
       link.innerHTML = `
         <span class="ep-num">Episode ${ep.number}</span>
         <span class="ep-src">Player Stream</span>
@@ -70,7 +81,7 @@ async function loadDetails() {
     });
   } catch(e) {
     console.error(e);
-    document.getElementById("anime-title").textContent = "Error loading streaming grids.";
+    document.getElementById("anime-title").textContent = "Streaming server communication issue.";
   }
 }
 loadDetails();
