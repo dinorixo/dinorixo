@@ -570,6 +570,337 @@ section{
 }
 
 </style>
+
+<style id="dixorino-hianime-ui">
+
+/* ===== DIXORINO STREAMING UI ===== */
+
+:root{
+  --pink:#ff3f91;
+  --purple:#8b5cf6;
+  --bg:#07080d;
+  --panel:#11131b;
+  --text:#f5f5f7;
+  --muted:#9295a3;
+}
+
+body{
+  background:
+    radial-gradient(circle at 20% 0%,rgba(255,63,145,.12),transparent 28%),
+    radial-gradient(circle at 85% 15%,rgba(139,92,246,.10),transparent 30%),
+    var(--bg)!important;
+}
+
+/* HEADER */
+
+header{
+  background:rgba(7,8,13,.88)!important;
+  backdrop-filter:blur(18px);
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+
+.logo{
+  letter-spacing:-1px;
+  background:linear-gradient(90deg,#ff3f91,#a855f7);
+  -webkit-background-clip:text;
+  color:transparent!important;
+}
+
+/* HERO */
+
+.hero{
+  min-height:430px!important;
+  margin:20px auto 35px!important;
+  max-width:1250px;
+  border-radius:24px!important;
+  overflow:hidden;
+  position:relative;
+  display:flex;
+  align-items:flex-end;
+  padding:45px!important;
+
+  background:
+    linear-gradient(90deg,
+      rgba(5,6,10,.98) 0%,
+      rgba(5,6,10,.82) 38%,
+      rgba(5,6,10,.25) 75%,
+      rgba(5,6,10,.65) 100%),
+    linear-gradient(0deg,
+      rgba(5,6,10,.9),
+      transparent 60%),
+    url("https://s4.anilist.co/file/anilistcdn/media/anime/banner/154587-9F8qG7kVwK2M.jpg")
+    center/cover;
+
+  box-shadow:
+    0 30px 90px rgba(0,0,0,.55),
+    0 0 60px rgba(255,63,145,.07);
+}
+
+.hero-content{
+  max-width:650px;
+  position:relative;
+  z-index:2;
+}
+
+.hero-label{
+  color:#ff70aa!important;
+  font-size:13px;
+  font-weight:800;
+  letter-spacing:2px;
+  margin-bottom:12px;
+}
+
+.hero h1{
+  font-size:clamp(42px,7vw,76px)!important;
+  line-height:.95;
+  margin:0 0 18px!important;
+  letter-spacing:-3px;
+}
+
+.hero-meta{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:15px;
+}
+
+.hero-meta span{
+  background:rgba(255,255,255,.09);
+  border:1px solid rgba(255,255,255,.08);
+  padding:7px 11px;
+  border-radius:7px;
+  font-size:13px;
+}
+
+.hero-meta .score{
+  color:#ffd166;
+}
+
+.hero p{
+  color:#c5c6ce!important;
+  line-height:1.7;
+  font-size:15px;
+  max-width:600px;
+}
+
+.hero-buttons{
+  display:flex;
+  gap:10px;
+  margin-top:22px;
+  flex-wrap:wrap;
+}
+
+.hero-btn{
+  padding:13px 21px;
+  border-radius:9px;
+  text-decoration:none;
+  font-weight:800;
+  transition:.2s;
+}
+
+.watch-btn{
+  color:white;
+  background:linear-gradient(90deg,var(--pink),var(--purple));
+  box-shadow:0 10px 30px rgba(255,63,145,.2);
+}
+
+.browse-btn{
+  color:white;
+  background:rgba(255,255,255,.09);
+  border:1px solid rgba(255,255,255,.1);
+}
+
+.hero-btn:hover{
+  transform:translateY(-2px);
+}
+
+/* SECTIONS */
+
+section{
+  margin:42px auto!important;
+  max-width:1250px;
+}
+
+.section-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:17px;
+}
+
+.section-head h2{
+  font-size:21px;
+  margin:0;
+}
+
+.section-head a{
+  color:#aaa;
+  text-decoration:none;
+  font-size:13px;
+}
+
+.section-head a:hover{
+  color:var(--pink);
+}
+
+/* TRENDING */
+
+.trending{
+  display:grid!important;
+  grid-template-columns:repeat(6,1fr);
+  gap:14px;
+}
+
+.trending .card{
+  min-width:0;
+}
+
+/* ANIME CARDS */
+
+.card{
+  background:#11131b!important;
+  border:1px solid rgba(255,255,255,.06)!important;
+  border-radius:12px!important;
+  box-shadow:0 10px 30px rgba(0,0,0,.18);
+  transition:
+    transform .22s,
+    box-shadow .22s,
+    border-color .22s!important;
+}
+
+.card:hover{
+  transform:translateY(-6px)!important;
+  border-color:rgba(255,63,145,.35)!important;
+  box-shadow:
+    0 20px 45px rgba(0,0,0,.45),
+    0 0 25px rgba(255,63,145,.08);
+}
+
+.card .poster{
+  height:270px!important;
+  object-fit:cover;
+}
+
+.card h3{
+  font-size:14px!important;
+  margin:11px 11px 6px!important;
+}
+
+.card p{
+  color:#858894!important;
+  margin:0 11px 12px!important;
+}
+
+.heart{
+  z-index:5;
+  backdrop-filter:blur(8px);
+  background:rgba(5,5,10,.75)!important;
+}
+
+/* GENRES */
+
+.genres{
+  display:flex!important;
+  flex-wrap:wrap;
+  gap:9px!important;
+}
+
+.genre{
+  background:#12141d!important;
+  color:#c8c9d1!important;
+  border:1px solid rgba(255,255,255,.07)!important;
+  padding:11px 16px!important;
+  border-radius:9px!important;
+  cursor:pointer;
+}
+
+.genre:hover{
+  background:linear-gradient(90deg,var(--pink),var(--purple))!important;
+  color:white!important;
+}
+
+/* SEARCH */
+
+#searchSection{
+  min-height:100px;
+}
+
+#results{
+  margin-top:15px;
+}
+
+/* MOBILE */
+
+@media(max-width:900px){
+
+.trending{
+  grid-template-columns:repeat(4,1fr);
+}
+
+.hero{
+  min-height:400px!important;
+  padding:30px!important;
+}
+
+}
+
+@media(max-width:600px){
+
+main{
+  padding:12px!important;
+}
+
+.hero{
+  min-height:440px!important;
+  margin:10px 0 25px!important;
+  padding:24px!important;
+
+  background:
+    linear-gradient(0deg,
+      rgba(5,6,10,.98) 0%,
+      rgba(5,6,10,.5) 65%,
+      rgba(5,6,10,.25)),
+    url("https://s4.anilist.co/file/anilistcdn/media/anime/banner/154587-9F8qG7kVwK2M.jpg")
+    center/cover;
+}
+
+.hero h1{
+  font-size:48px!important;
+}
+
+.hero p{
+  font-size:14px;
+}
+
+.trending{
+  grid-template-columns:repeat(3,1fr);
+  gap:9px;
+}
+
+.card .poster{
+  height:210px!important;
+}
+
+.section-head h2{
+  font-size:18px;
+}
+
+}
+
+@media(max-width:420px){
+
+.trending{
+  grid-template-columns:repeat(2,1fr);
+}
+
+.card .poster{
+  height:235px!important;
+}
+
+}
+
+</style>
+
 </head>
 
 <body>
@@ -742,9 +1073,16 @@ Favorites
 </div>
 
 <script>
-<script>
 
 const API="https://api.jikan.moe/v4";
+
+window.addEventListener("error",function(e){
+  console.error("DIXORINO ERROR:",e.error||e.message);
+});
+
+window.addEventListener("unhandledrejection",function(e){
+  console.error("DIXORINO PROMISE ERROR:",e.reason);
+});
 
 let favorites=
 JSON.parse(
@@ -865,58 +1203,79 @@ loadFavorites();
 
 async function getAnime(url){
 
-const response=
-await fetch(url);
+  const response=await fetch(url);
 
-const data=
-await response.json();
+  if(!response.ok){
+    throw new Error("Jikan API error: "+response.status);
+  }
 
-return data.data||[];
+  const data=await response.json();
+
+  return data.data||[];
 
 }
 
 async function loadPopular(){
 
-try{
+  const box=document.getElementById("popularGrid");
 
-const data=
-await getAnime(
-API+"/top/anime?limit=12"
-);
+  try{
+    box.innerHTML="<div class='loading'>Loading popular anime...</div>";
 
-document.getElementById("popularGrid").innerHTML=
-data.map(createCard).join("");
+    const response=await fetch(
+      "https://api.jikan.moe/v4/top/anime?limit=18"
+    );
 
-}catch(e){
+    if(!response.ok){
+      throw new Error("Popular API "+response.status);
+    }
 
-document.getElementById("popularGrid").innerHTML=
-"<div class='loading'>Unable to load anime.</div>";
+    const json=await response.json();
+    const data=json.data||[];
 
-}
+    box.innerHTML=data.length
+      ? data.map(createCard).join("")
+      : "<div class='loading'>No popular anime found.</div>";
 
+  }catch(error){
+
+    console.error("POPULAR ERROR:",error);
+
+    box.innerHTML=
+      "<div class='loading'>Unable to load popular anime.</div>";
+  }
 }
 
 async function loadLatest(){
 
-try{
+  const box=document.getElementById("latest");
 
-const data=
-await getAnime(
-API+"/anime?order_by=mal_id&sort=desc&limit=12"
-);
+  try{
+    box.innerHTML="<div class='loading'>Loading latest anime...</div>";
 
-document.getElementById("latest").innerHTML=
-data.map(createCard).join("");
+    const response=await fetch(
+      "https://api.jikan.moe/v4/anime?order_by=mal_id&sort=desc&limit=18"
+    );
 
-}catch(e){
+    if(!response.ok){
+      throw new Error("Latest API "+response.status);
+    }
 
-document.getElementById("latest").innerHTML=
-"<div class='loading'>Unable to load anime.</div>";
+    const json=await response.json();
+    const data=json.data||[];
 
+    box.innerHTML=data.length
+      ? data.map(createCard).join("")
+      : "<div class='loading'>No latest anime found.</div>";
+
+  }catch(error){
+
+    console.error("LATEST ERROR:",error);
+
+    box.innerHTML=
+      "<div class='loading'>Unable to load latest anime.</div>";
+  }
 }
-
-}
-
 
 let searchPage = 1;
 let currentSearch = "";
@@ -1251,13 +1610,6 @@ timer=setTimeout(
 
 });
 
-loadPopular();
-loadLatest();
-loadFavorites();
-loadContinue();
-
-
-
 /* DIXORINO HOME UI */
 
 function makeTrendingCard(a,index){
@@ -1299,38 +1651,35 @@ ${escapeHTML(title)}
 
 async function loadTrending(){
 
-try{
+  const box=document.getElementById("trendingGrid");
 
-const r=await fetch(
-API+"/top/anime?limit=12"
-);
+  try{
 
-if(!r.ok)throw new Error("Trending failed");
+    box.innerHTML=
+      "<div class='loading'>Loading trending anime...</div>";
 
-const x=await r.json();
+    const response=await fetch(
+      "https://api.jikan.moe/v4/top/anime?limit=12"
+    );
 
-const data=x.data||[];
+    if(!response.ok){
+      throw new Error("Trending API "+response.status);
+    }
 
-const box=document.getElementById("trendingGrid");
+    const json=await response.json();
+    const data=json.data||[];
 
-if(!data.length){
-box.innerHTML="<div class='loading'>No trending anime.</div>";
-return;
-}
+    box.innerHTML=data.length
+      ? data.map((a,i)=>makeTrendingCard(a,i)).join("")
+      : "<div class='loading'>No trending anime found.</div>";
 
-box.innerHTML=data.map(
-(a,i)=>makeTrendingCard(a,i)
-).join("");
+  }catch(error){
 
-}catch(e){
+    console.error("TRENDING ERROR:",error);
 
-console.error("Trending:",e);
-
-document.getElementById("trendingGrid").innerHTML=
-"<div class='loading'>Trending anime unavailable.</div>";
-
-}
-
+    box.innerHTML=
+      "<div class='loading'>Unable to load trending anime.</div>";
+  }
 }
 
 loadTrending();
