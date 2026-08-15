@@ -1225,82 +1225,169 @@ async function getAnime(url){
 
 }
 
+async function aniListRequest(query){
+
+  const response=await fetch(
+    "https://graphql.anilist.co",
+    {
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "Accept":"application/json"
+      },
+      body:JSON.stringify({query})
+    }
+  );
+
+  if(!response.ok){
+    throw new Error("AniList HTTP "+response.status);
+  }
+
+  const json=await response.json();
+
+  if(json.errors){
+    throw new Error(
+      json.errors[0]?.message||"AniList error"
+    );
+  }
+
+  return json.data;
+}
+
+
+function aniAnime(a){
+
+  return {
+    mal_id:a.idMal||a.id,
+    anilist_id:a.id,
+
+    title:
+      a.title?.english||
+      a.title?.romaji||
+      a.title?.native||
+      "Unknown",
+
+    images:{
+      jpg:{
+        large_image_url:
+          a.coverImage?.large||
+          a.coverImage?.medium||
+          ""
+      }
+    },
+
+    score:a.averageScore
+      ? a.averageScore/10
+      : null,
+
+    episodes:a.episodes
+  };
+
+}
+
+
 async function loadPopular(){
 
-const box=document.getElementById("popularGrid");
+  const box=document.getElementById("popularGrid");
 
-try{
+  try{
 
-box.innerHTML=
-"<div class='loading'>Loading popular anime...</div>";
+    box.innerHTML=
+      "<div class='loading'>Loading popular anime...</div>";
 
-const r=await fetch(
-"https://api.jikan.moe/v4/top/anime?limit=18"
-);
+    const data=await aniListRequest(`
+      query{
+        Page(page:1,perPage:18){
+          media(
+            type:ANIME,
+            sort:[POPULARITY_DESC]
+          ){
+            id
+            idMal
+            title{
+              english
+              romaji
+              native
+            }
+            coverImage{
+              large
+              medium
+            }
+            averageScore
+            episodes
+          }
+        }
+      }
+    `);
 
-if(!r.ok){
-throw new Error("Popular API "+r.status);
-}
+    const anime=
+      (data.Page?.media||[]).map(aniAnime);
 
-const x=await r.json();
-const data=x.data||[];
+    box.innerHTML=anime.length
+      ? anime.map(createCard).join("")
+      : "<div class='loading'>No popular anime.</div>";
 
-if(!data.length){
-box.innerHTML=
-"<div class='loading'>No popular anime found.</div>";
-return;
-}
+  }catch(error){
 
-box.innerHTML=data.map(createCard).join("");
+    console.error("POPULAR:",error);
 
-}catch(e){
+    box.innerHTML=
+      "<div class='loading'>Popular anime unavailable.</div>";
 
-console.error("POPULAR:",e);
-
-box.innerHTML=
-"<div class='loading'>Popular anime unavailable.</div>";
-
-}
+  }
 
 }
 
 
 async function loadLatest(){
 
-const box=document.getElementById("latest");
+  const box=document.getElementById("latest");
 
-try{
+  try{
 
-box.innerHTML=
-"<div class='loading'>Loading latest anime...</div>";
+    box.innerHTML=
+      "<div class='loading'>Loading latest anime...</div>";
 
-const r=await fetch(
-"https://api.jikan.moe/v4/seasons/now?limit=18"
-);
+    const data=await aniListRequest(`
+      query{
+        Page(page:1,perPage:18){
+          media(
+            type:ANIME,
+            sort:[START_DATE_DESC]
+          ){
+            id
+            idMal
+            title{
+              english
+              romaji
+              native
+            }
+            coverImage{
+              large
+              medium
+            }
+            averageScore
+            episodes
+          }
+        }
+      }
+    `);
 
-if(!r.ok){
-throw new Error("Latest API "+r.status);
-}
+    const anime=
+      (data.Page?.media||[]).map(aniAnime);
 
-const x=await r.json();
-const data=x.data||[];
+    box.innerHTML=anime.length
+      ? anime.map(createCard).join("")
+      : "<div class='loading'>No latest anime.</div>";
 
-if(!data.length){
-box.innerHTML=
-"<div class='loading'>No latest anime found.</div>";
-return;
-}
+  }catch(error){
 
-box.innerHTML=data.map(createCard).join("");
+    console.error("LATEST:",error);
 
-}catch(e){
+    box.innerHTML=
+      "<div class='loading'>Latest anime unavailable.</div>";
 
-console.error("LATEST:",e);
-
-box.innerHTML=
-"<div class='loading'>Latest anime unavailable.</div>";
-
-}
+  }
 
 }
 
@@ -1824,39 +1911,53 @@ async function loadTrending(){
     box.innerHTML=
       "<div class='loading'>Loading trending anime...</div>";
 
-    const response=await fetch(
-      "https://api.jikan.moe/v4/top/anime?limit=12"
-    );
+    const data=await aniListRequest(`
+      query{
+        Page(page:1,perPage:12){
+          media(
+            type:ANIME,
+            sort:[TRENDING_DESC]
+          ){
+            id
+            idMal
+            title{
+              english
+              romaji
+              native
+            }
+            coverImage{
+              large
+              medium
+            }
+            averageScore
+            episodes
+          }
+        }
+      }
+    `);
 
-    if(!response.ok){
-      throw new Error("Trending API "+response.status);
-    }
+    const anime=
+      (data.Page?.media||[]).map(aniAnime);
 
-    const json=await response.json();
-    const data=json.data||[];
-
-    box.innerHTML=data.length
-      ? data.map((a,i)=>makeTrendingCard(a,i)).join("")
-      : "<div class='loading'>No trending anime found.</div>";
+    box.innerHTML=anime.map(
+      (a,i)=>makeTrendingCard(a,i)
+    ).join("");
 
   }catch(error){
 
-    console.error("TRENDING ERROR:",error);
+    console.error("TRENDING:",error);
 
     box.innerHTML=
-      "<div class='loading'>Unable to load trending anime.</div>";
+      "<div class='loading'>Trending anime unavailable.</div>";
+
   }
+
 }
 
 loadTrending();
 
-setTimeout(()=>{
-  loadPopular();
-},1200);
-
-setTimeout(()=>{
-  loadLatest();
-},2400);
+setTimeout(loadPopular,1000);
+setTimeout(loadLatest,2000);
 
 
 </script>
