@@ -1514,17 +1514,22 @@ async function openGenre(name){
 
 }
 
-let timer;
-
 document.getElementById("search")
-.addEventListener("input",function(){
+.addEventListener("keydown",function(e){
 
-clearTimeout(timer);
+if(e.key==="Enter"){
 
-timer=setTimeout(
-()=>searchAnime(this.value),
-500
-);
+const query=this.value.trim();
+
+if(query){
+
+location.href=
+"search.html?q="+
+encodeURIComponent(query);
+
+}
+
+}
 
 });
 
