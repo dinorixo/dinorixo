@@ -4,872 +4,120 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>DIXORINO - Watch</title>
-
+<script src="https://jsdelivr.net"></script>
 <style>
 *{box-sizing:border-box}
-
-body{
-margin:0;
-background:#08090d;
-color:#fff;
-font-family:Arial,sans-serif
-}
-
-header{
-height:70px;
-background:#10121a;
-display:flex;
-align-items:center;
-padding:0 20px;
-gap:25px;
-position:sticky;
-top:0;
-z-index:10
-}
-
-.logo{
-font-size:27px;
-font-weight:900;
-color:#ff3f91
-}
-
-header a{
-color:#fff;
-text-decoration:none
-}
-
-main{
-max-width:1100px;
-margin:auto;
-padding:20px
-}
-
-.back{
-color:#ff3f91;
-text-decoration:none;
-display:inline-block;
-margin-bottom:15px
-}
-
-.player-wrap{
-position:relative;
-background:#000;
-border-radius:14px;
-overflow:hidden;
-box-shadow:0 10px 35px rgba(0,0,0,.35)
-}
-
-video{
-width:100%;
-display:block;
-aspect-ratio:16/9;
-background:#000
-}
-
-.player-status{
-position:absolute;
-left:15px;
-bottom:15px;
-background:rgba(0,0,0,.7);
-padding:8px 12px;
-border-radius:7px;
-font-size:13px;
-color:#bbb;
-pointer-events:none
-}
-
-h1{
-font-size:27px;
-margin:20px 0 5px
-}
-
-.muted{
-color:#999
-}
-
-.controls{
-display:flex;
-gap:10px;
-margin:20px 0;
-flex-wrap:wrap
-}
-
-.control{
-background:#191c26;
-color:#fff;
-padding:12px 18px;
-border-radius:8px;
-text-decoration:none;
-border:0;
-cursor:pointer;
-font-size:14px
-}
-
-.control:hover{
-background:#ff3f91
-}
-
-.control.disabled{
-opacity:.4;
-pointer-events:none
-}
-
-.progress{
-height:4px;
-background:#242733;
-border-radius:5px;
-margin-top:12px;
-overflow:hidden
-}
-
-.progress-bar{
-height:100%;
-width:0%;
-background:#ff3f91;
-transition:width .2s
-}
-
-.episodes{
-display:grid;
-grid-template-columns:repeat(6,1fr);
-gap:9px;
-margin-top:15px
-}
-
-.ep{
-background:#191c26;
-color:#fff;
-border:0;
-padding:13px 7px;
-border-radius:7px;
-cursor:pointer
-}
-
-.ep:hover,
-.ep.active{
-background:#ff3f91
-}
-
-.notice{
-margin-top:25px;
-padding:15px;
-background:#151821;
-border-radius:10px;
-color:#999;
-font-size:13px;
-line-height:1.5
-}
-
-@media(max-width:700px){
-
-main{
-padding:15px
-}
-
-header{
-padding:0 15px
-}
-
-.logo{
-font-size:23px
-}
-
-h1{
-font-size:23px
-}
-
-.episodes{
-grid-template-columns:repeat(3,1fr)
-}
-
-.ep{
-padding:12px 5px
-}
-
-}
-
-/* ================================
-   DIXORINO 2.0 — MODERN UI
-   ================================ */
-
-:root{
-  --bg:#07070b;
-  --panel:#101018;
-  --panel2:#151520;
-  --accent:#ff3f91;
-  --accent2:#9b5cff;
-  --text:#f7f7fb;
-  --muted:#9292a3;
-  --border:rgba(255,255,255,.08);
-}
-
-*{
-  box-sizing:border-box;
-}
-
-body{
-  background:
-    radial-gradient(circle at 15% 0%,rgba(255,63,145,.10),transparent 30%),
-    radial-gradient(circle at 85% 10%,rgba(155,92,255,.10),transparent 28%),
-    var(--bg) !important;
-  color:var(--text) !important;
-}
-
-/* HEADER */
-
-header{
-  height:72px !important;
-  background:rgba(10,10,16,.82) !important;
-  backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
-  border-bottom:1px solid var(--border);
-  padding:0 28px !important;
-  position:sticky;
-  top:0;
-  z-index:100;
-}
-
-.logo{
-  font-size:25px !important;
-  font-weight:950 !important;
-  letter-spacing:-1px;
-  background:linear-gradient(90deg,#ff3f91,#b56cff);
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent !important;
-}
-
-header a{
-  color:#d8d8e2 !important;
-  font-weight:600;
-  transition:.2s;
-}
-
-header a:hover{
-  color:#fff !important;
-}
-
-/* MAIN */
-
-main{
-  max-width:1250px !important;
-  padding:30px 22px !important;
-}
-
-/* SEARCH */
-
-input[type="search"],
-input[type="text"]{
-  background:rgba(255,255,255,.055) !important;
-  border:1px solid var(--border) !important;
-  color:#fff !important;
-  border-radius:14px !important;
-  padding:14px 18px !important;
-  outline:none;
-  transition:.25s;
-}
-
-input[type="search"]:focus,
-input[type="text"]:focus{
-  border-color:rgba(255,63,145,.6) !important;
-  box-shadow:0 0 0 4px rgba(255,63,145,.08);
-}
-
-/* CARDS */
-
-.card{
-  background:linear-gradient(
-    145deg,
-    rgba(255,255,255,.075),
-    rgba(255,255,255,.025)
-  ) !important;
-  border:1px solid var(--border);
-  border-radius:16px !important;
-  overflow:hidden;
-  transition:
-    transform .25s ease,
-    box-shadow .25s ease,
-    border-color .25s ease;
-  position:relative;
-}
-
-.card:hover{
-  transform:translateY(-7px);
-  border-color:rgba(255,63,145,.35);
-  box-shadow:
-    0 18px 45px rgba(0,0,0,.45),
-    0 0 30px rgba(255,63,145,.08);
-}
-
-.card img{
-  transition:transform .4s ease;
-}
-
-.card:hover img{
-  transform:scale(1.045);
-}
-
-/* BUTTONS */
-
-button,
-.control,
-.load-more{
-  border:1px solid rgba(255,255,255,.08) !important;
-  border-radius:11px !important;
-  transition:.2s ease !important;
-}
-
-button:hover,
-.control:hover,
-.load-more:hover{
-  background:linear-gradient(90deg,var(--accent),var(--accent2)) !important;
-  color:#fff !important;
-  transform:translateY(-1px);
-}
-
-/* TAGS */
-
-.tag{
-  background:rgba(255,63,145,.10) !important;
-  border:1px solid rgba(255,63,145,.18);
-  color:#ff8cba !important;
-  border-radius:999px !important;
-  padding:5px 10px !important;
-}
-
-/* DETAILS HERO */
-
-.hero{
-  background:
-    linear-gradient(
-      135deg,
-      rgba(255,255,255,.075),
-      rgba(255,255,255,.025)
-    ) !important;
-  border:1px solid var(--border);
-  border-radius:24px !important;
-  padding:25px !important;
-  box-shadow:0 25px 70px rgba(0,0,0,.3);
-  overflow:hidden;
-}
-
-.poster{
-  border-radius:17px !important;
-  box-shadow:0 20px 50px rgba(0,0,0,.5);
-}
-
-.content h1{
-  font-size:clamp(30px,5vw,54px) !important;
-  letter-spacing:-1.5px;
-}
-
-.description{
-  color:#b6b6c3 !important;
-  line-height:1.75 !important;
-}
-
-/* INFO */
-
-.info{
-  background:rgba(255,255,255,.035);
-  border:1px solid var(--border);
-  border-radius:14px;
-  padding:15px 17px;
-  line-height:1.9;
-  color:#d4d4df;
-}
-
-/* FAVORITE */
-
-.favorite{
-  background:linear-gradient(
-    90deg,
-    var(--accent),
-    var(--accent2)
-  ) !important;
-  color:#fff !important;
-  font-weight:700;
-  border:0 !important;
-  padding:13px 22px !important;
-}
-
-/* TRAILER */
-
-.trailer{
-  margin-top:25px;
-  border-radius:18px;
-  overflow:hidden;
-}
-
-/* EPISODES */
-
-.episodes{
-  gap:10px !important;
-}
-
-.ep{
-  background:#14141e !important;
-  border:1px solid var(--border) !important;
-  color:#ddd !important;
-}
-
-.ep.active,
-.ep:hover{
-  background:linear-gradient(
-    90deg,
-    var(--accent),
-    var(--accent2)
-  ) !important;
-}
-
-/* WATCH PLAYER */
-
-.player-wrap{
-  border:1px solid var(--border);
-  box-shadow:
-    0 25px 70px rgba(0,0,0,.55),
-    0 0 50px rgba(255,63,145,.05);
-}
-
-video{
-  border-radius:14px;
-}
-
-.player-status{
-  background:rgba(5,5,10,.82) !important;
-  border:1px solid var(--border);
-  backdrop-filter:blur(10px);
-}
-
-/* WATCH NOTICE */
-
-.notice{
-  background:rgba(255,255,255,.035) !important;
-  border:1px solid var(--border);
-  color:#9292a3 !important;
-}
-
-/* LOADING */
-
-.loading{
-  color:#aaa !important;
-}
-
-/* MOBILE */
-
-@media(max-width:700px){
-
-  header{
-    height:62px !important;
-    padding:0 15px !important;
-  }
-
-  main{
-    padding:20px 14px !important;
-  }
-
-  .hero{
-    padding:15px !important;
-    border-radius:18px !important;
-  }
-
-  .poster{
-    border-radius:13px !important;
-  }
-
-  .card{
-    border-radius:13px !important;
-  }
-
-}
-
-/* SCROLLBAR */
-
-::-webkit-scrollbar{
-  width:8px;
-}
-
-::-webkit-scrollbar-track{
-  background:#07070b;
-}
-
-::-webkit-scrollbar-thumb{
-  background:#292936;
-  border-radius:20px;
-}
-
-::-webkit-scrollbar-thumb:hover{
-  background:#ff3f91;
-}
-
+body{margin:0;background:#08090d;color:#fff;font-family:Arial,sans-serif}
+header{height:70px;background:#10121a;display:flex;align-items:center;padding:0 20px;gap:25px;position:sticky;top:0;z-index:10}
+.logo{font-size:27px;font-weight:900;color:#ff3f91}
+header a{color:#fff;text-decoration:none}
+main{max-width:1100px;margin:auto;padding:20px}
+.back{color:#ff3f91;text-decoration:none;display:inline-block;margin-bottom:15px}
+.player-wrap{position:relative;background:#000;border-radius:14px;overflow:hidden;box-shadow:0 10px 35px rgba(0,0,0,.35)}
+video{width:100%;display:block;aspect-ratio:16/9;background:#000}
+.player-status{position:absolute;left:15px;bottom:15px;background:rgba(0,0,0,.7);padding:8px 12px;border-radius:7px;font-size:13px;color:#bbb;pointer-events:none}
+h1{font-size:27px;margin:20px 0 5px}
+.muted{color:#999}
+.controls{display:flex;gap:10px;margin:20px 0;flex-wrap:wrap}
+.control{background:#191c26;color:#fff;padding:12px 18px;border-radius:8px;text-decoration:none;border:0;cursor:pointer;font-size:14px}
+.control:hover{background:#ff3f91}
+.control.disabled{opacity:.4;pointer-events:none}
+.progress{height:4px;background:#242733;border-radius:5px;margin-top:12px;overflow:hidden}
+.progress-bar{height:100%;width:0%;background:#ff3f91;transition:width .2s}
+.episodes{display:grid;grid-template-columns:repeat(6,1fr);gap:9px;margin-top:15px}
+.ep{background:#191c26;color:#fff;border:0;padding:13px 7px;border-radius:7px;cursor:pointer}
+.ep:hover,.ep.active{background:#ff3f91}
+.notice{margin-top:25px;padding:15px;background:#151821;border-radius:10px;color:#999;font-size:13px;line-height:1.5}
+:root{--bg:#07070b;--panel:#101018;--accent:#ff3f91;--accent2:#9b5cff;--text:#f7f7fb;--border:rgba(255,255,255,.08);}
+body{background:radial-gradient(circle at 15% 0%,rgba(255,63,145,.10),transparent 30%),radial-gradient(circle at 85% 10%,rgba(155,92,255,.10),transparent 28%),var(--bg) !important;color:var(--text) !important;}
+header{height:72px !important;background:rgba(10,10,16,.82) !important;backdrop-filter:blur(18px);border-bottom:1px solid var(--border);padding:0 28px !important;}
+.logo{background:linear-gradient(90deg,#ff3f91,#b56cff);-webkit-background-clip:text;background-clip:text;color:transparent !important;}
+button,.control{border:1px solid rgba(255,255,255,.08) !important;border-radius:11px !important;}
+button:hover,.control:hover{background:linear-gradient(90deg,var(--accent),var(--accent2)) !important;color:#fff !important;}
+.episodes{gap:10px !important;}
+.ep{background:#14141e !important;border:1px solid var(--border) !important;color:#ddd !important;}
+.ep.active,.ep:hover{background:linear-gradient(90deg,var(--accent),var(--accent2)) !important;}
+.player-wrap{border:1px solid var(--border);box-shadow:0 25px 70px rgba(0,0,0,.55),0 0 50px rgba(255,63,145,.05);}
+video{border-radius:14px;}
+.player-status{background:rgba(5,5,10,.82) !important;border:1px solid var(--border);backdrop-filter:blur(10px);}
+@media(max-width:700px){.episodes{grid-template-columns:repeat(3,1fr)}}
 </style>
 </head>
-
 <body>
-
-<header>
-<div class="logo">DIXORINO</div>
-<a href="/">Home</a>
-</header>
-
+<header><div class="logo">DIXORINO</div><a href="/">Home</a></header>
 <main>
-
 <a class="back" id="back">← Back to Anime</a>
-
 <div class="player-wrap">
-
-<video
-id="player"
-controls
-playsinline
-preload="metadata">
-
-
-Your browser does not support video playback.
-
-</video>
-
-<div class="player-status" id="playerStatus">
-Ready
+<video id="player" controls playsinline preload="metadata"></video>
+<div class="player-status" id="playerStatus">Ready</div>
 </div>
-
-</div>
-
-<div class="progress">
-<div class="progress-bar" id="progressBar"></div>
-</div>
-
+<div class="progress"><div class="progress-bar" id="progressBar"></div></div>
 <h1 id="title">Loading...</h1>
-
-<div class="muted" id="episode">
-Episode 1
-</div>
-
-<div class="controls">
-
-<a class="control" id="previous">
-← Previous
-</a>
-
-<a class="control" id="next">
-Next →
-</a>
-
-</div>
-
+<div class="muted" id="episode">Episode 1</div>
+<div class="controls"><a class="control" id="previous">← Previous</a><a class="control" id="next">Next →</a></div>
 <h2>Episodes</h2>
-
 <div class="episodes" id="episodes"></div>
-
-<div class="notice">
-This player is configured for video content that you own or are authorized to stream.
-Demo video is currently being used as the playback source.
-</div>
-
 </main>
-
 <script>
-
-const params=new URLSearchParams(location.search);
-
-const anime=params.get("anime")||"Anime";
-const id=params.get("id")||"";
-const episode=Number(params.get("episode"))||1;
-const total=Math.max(
-1,
-Number(params.get("total"))||12
-);
-
-const player=document.getElementById("player");
-const status=document.getElementById("playerStatus");
-const progressBar=document.getElementById("progressBar");
-
-const videoUrl=params.get("video")||"";
-const videoKey=(id||"")+"_"+episode;
-
-async function loadVideoSource(){
-
-  if(videoUrl){
-    player.src=videoUrl;
-    player.load();
-    return;
-  }
-
-  try{
-    const r=await fetch("data/videos.json");
-    const videos=await r.json();
-    const source=videos[videoKey];
-
-    if(source){
-      player.src=source;
-      player.load();
-      status.textContent="Loading video...";
-    }else{
-      status.textContent="No authorized video source configured for this episode.";
-    }
-
-  }catch(e){
-    console.error(e);
-    status.textContent="Could not load video source.";
-  }
+const params = new URLSearchParams(location.search);
+const anime = params.get("anime") || "Anime";
+const id = params.get("id") || "";
+const currentEpisodeNum = Number(params.get("episode")) || 1;
+const player = document.getElementById("player");
+const status = document.getElementById("playerStatus");
+const progressBar = document.getElementById("progressBar");
+document.title = "DIXORINO - " + anime;
+document.getElementById("title").textContent = anime;
+document.getElementById("episode").textContent = "Episode " + currentEpisodeNum;
+document.getElementById("back").href = id ? "details.html?id=" + encodeURIComponent(id) : "/";
+async function loadVideoSource() {
+  if (!id) { status.textContent = "Error: Missing ID"; return; }
+  status.textContent = "Connecting to network...";
+  try {
+    const epRes = await fetch(`/api/episodes?id=${id}`);
+    const epData = await epRes.json();
+    const episodeList = epData.episodes || [];
+    const box = document.getElementById("episodes");
+    box.innerHTML = "";
+    episodeList.forEach((ep) => {
+      const button = document.createElement("button");
+      button.className = "ep" + (ep.number === currentEpisodeNum ? " active" : "");
+      button.textContent = "Ep " + ep.number;
+      button.onclick = () => { location.href = `watch.html?anime=${encodeURIComponent(anime)}&episode=${ep.number}&id=${encodeURIComponent(id)}`; };
+      box.appendChild(button);
+    });
+    const activeEpisodeItem = episodeList.find(e => e.number === currentEpisodeNum) || episodeList[0];
+    if (!activeEpisodeItem) { status.textContent = "No episodes found."; return; }
+    const prevBtn = document.getElementById("previous");
+    const nextBtn = document.getElementById("next");
+    const prevEpItem = episodeList.find(e => e.number === currentEpisodeNum - 1);
+    const nextEpItem = episodeList.find(e => e.number === currentEpisodeNum + 1);
+    if (prevEpItem) { prevBtn.href = `watch.html?anime=${encodeURIComponent(anime)}&episode=${prevEpItem.number}&id=${encodeURIComponent(id)}`; } else { prevBtn.classList.add("disabled"); }
+    if (nextEpItem) { nextBtn.href = `watch.html?anime=${encodeURIComponent(anime)}&episode=${nextEpItem.number}&id=${encodeURIComponent(id)}`; } else { nextBtn.classList.add("disabled"); }
+    status.textContent = "Extracting stream...";
+    const streamRes = await fetch(`/api/stream?animeId=${id}&episodeId=${encodeURIComponent(activeEpisodeItem.id)}&number=${currentEpisodeNum}`);
+    const streamData = await streamRes.json();
+    const targetSource = streamData.sources?.find(s => s.quality === "default" || s.quality === "1080p") || streamData.sources?.[0];
+    if (targetSource && targetSource.url) {
+      status.textContent = "Playing";
+      if (Hls.isSupported()) {
+        const hls = new Hls();
+        hls.loadSource(targetSource.url);
+        hls.attachMedia(player);
+        hls.on(Hls.Events.MANIFEST_PARSED, () => { player.play().catch(e => console.log(e)); });
+      } else {
+        player.src = targetSource.url;
+        player.play().catch(e => console.log(e));
+      }
+    } else { status.textContent = "No stream found."; }
+  } catch(e) { console.error(e); status.textContent = "Streaming error."; }
 }
-
 loadVideoSource();
-
-document.title="DIXORINO - "+anime;
-
-document.getElementById("title").textContent=anime;
-
-document.getElementById("episode").textContent=
-"Episode "+episode;
-
-document.getElementById("back").href=
-id
-?"details.html?id="+encodeURIComponent(id)
-:"/";
-
-function watchURL(ep){
-
-return "watch.html?anime="+
-encodeURIComponent(anime)+
-"&episode="+ep+
-"&id="+encodeURIComponent(id)+
-"&total="+total;
-
-}
-
-const previous=
-document.getElementById("previous");
-
-const next=
-document.getElementById("next");
-
-if(episode>1){
-
-previous.href=
-watchURL(episode-1);
-
-}else{
-
-previous.classList.add("disabled");
-
-}
-
-if(episode<total){
-
-next.href=
-watchURL(episode+1);
-
-}else{
-
-next.classList.add("disabled");
-
-}
-
-/* Episode buttons */
-
-const box=
-document.getElementById("episodes");
-
-for(let i=1;i<=total;i++){
-
-const button=
-document.createElement("button");
-
-button.className=
-"ep"+(i===episode?" active":"");
-
-button.textContent=
-"Episode "+i;
-
-button.onclick=()=>{
-location.href=watchURL(i);
-};
-
-box.appendChild(button);
-
-}
-
-/* Progress storage */
-
-const progressKey=
-"dixorinoProgress_"+(id||anime)+"_"+episode;
-
-const savedPosition=
-Number(
-localStorage.getItem(progressKey)||0
-);
-
-/* Save Continue Watching */
-
-function saveContinue(){
-
-localStorage.setItem(
-"dixorinoLastWatched",
-JSON.stringify({
-anime:anime,
-episode:episode,
-id:id,
-total:total,
-time:player.currentTime||0
-})
-);
-
-}
-
-/* Restore playback position */
-
-player.addEventListener("loadedmetadata",()=>{
-
-if(
-savedPosition>0 &&
-savedPosition<player.duration-5
-){
-
-player.currentTime=
-savedPosition;
-
-status.textContent=
-"Resumed from "+formatTime(savedPosition);
-
-}else{
-
-status.textContent="Ready";
-
-}
-
+player.addEventListener("timeupdate", () => {
+  if (!player.duration) return;
+  const percent = (player.currentTime / player.duration) * 100;
+  progressBar.style.width = percent + "%";
 });
-
-/* Update progress */
-
-player.addEventListener("timeupdate",()=>{
-
-if(!player.duration)return;
-
-const percent=
-(player.currentTime/player.duration)*100;
-
-progressBar.style.width=
-percent+"%";
-
-localStorage.setItem(
-progressKey,
-String(player.currentTime)
-);
-
-saveContinue();
-
-});
-
-/* Playback status */
-
-player.addEventListener("play",()=>{
-
-status.textContent="Playing";
-
-});
-
-player.addEventListener("pause",()=>{
-
-if(!player.ended){
-status.textContent="Paused";
-}
-
-saveContinue();
-
-});
-
-player.addEventListener("waiting",()=>{
-
-status.textContent="Buffering...";
-
-});
-
-player.addEventListener("canplay",()=>{
-
-if(!player.paused){
-status.textContent="Playing";
-}else{
-status.textContent="Ready";
-}
-
-});
-
-player.addEventListener("ended",()=>{
-
-status.textContent="Finished";
-
-progressBar.style.width="100%";
-
-saveContinue();
-
-});
-
-/* Error handling */
-
-player.addEventListener("error",()=>{
-
-status.textContent=
-"Video could not be loaded.";
-
-});
-
-/* Format time */
-
-function formatTime(seconds){
-
-seconds=Math.floor(seconds);
-
-const minutes=
-Math.floor(seconds/60);
-
-const secs=
-String(seconds%60).padStart(2,"0");
-
-return minutes+":"+secs;
-
-}
-
-/* Keyboard shortcuts */
-
-document.addEventListener("keydown",e=>{
-
-if(
-e.target.tagName==="INPUT" ||
-e.target.tagName==="TEXTAREA"
-)return;
-
-if(e.code==="Space"){
-
-e.preventDefault();
-
-if(player.paused){
-player.play();
-}else{
-player.pause();
-}
-
-}
-
-if(e.key==="ArrowRight"){
-
-player.currentTime+=5;
-
-}
-
-if(e.key==="ArrowLeft"){
-
-player.currentTime-=5;
-
-}
-
-});
-
-/* Save before leaving */
-
-window.addEventListener("beforeunload",saveContinue);
-
 </script>
-
 </body>
 </html>
