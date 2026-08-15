@@ -530,7 +530,56 @@ style="display:flex;align-items:center;justify-content:center;font-size:40px">
 
 const genreList=[["Action",1],["Adventure",2],["Comedy",4],["Fantasy",10],["Romance",22],["Sports",30],["Horror",14],["Mystery",7],["Sci-Fi",24],["Supernatural",37]];
 document.getElementById("genres").innerHTML=genreList.map(g=>`<button style="background:#191c26;color:white;border:0;padding:11px 16px;border-radius:20px" onclick="openGenre(${g[1]},'${g[0]}')">${g[0]}</button>`).join("");
-async function openGenre(id,name){document.getElementById("searchSection").style.display="block";document.getElementById("results").innerHTML="<div class=loading>Loading "+name+" anime...</div>";try{const data=await getAnime(API+"/anime?genres="+id+"&order_by=score&sort=desc&limit=12");document.getElementById("results").innerHTML="<h2>"+name+" Anime</h2>"+(data.length?data.map(createCard).join(""):"<div class=loading>No anime found.</div>");window.scrollTo({top:document.getElementById("searchSection").offsetTop-80,behavior:"smooth"})}catch(e){document.getElementById("results").innerHTML="<div class=loading>Could not load this genre.</div>"}}
+async function openGenre(id,name){
+
+document.getElementById("searchSection").style.display="block";
+document.getElementById("results").innerHTML=
+"<div class='loading'>Loading "+name+" anime...</div>";
+
+const urls=[
+API+"/anime?genres="+id+"&order_by=score&sort=desc&limit=12",
+API+"/anime?genres="+id+"&limit=12"
+];
+
+for(const url of urls){
+
+try{
+
+const response=await fetch(url);
+
+if(!response.ok) continue;
+
+const data=await response.json();
+
+if(data.data && data.data.length){
+
+document.getElementById("results").innerHTML=
+"<h2>"+name+" Anime</h2>"+
+data.data.map(createCard).join("");
+
+window.scrollTo({
+top:document.getElementById("searchSection").offsetTop-80,
+behavior:"smooth"
+});
+
+return;
+
+}
+
+}catch(e){
+
+console.log("Genre request failed:",e);
+
+}
+
+}
+
+document.getElementById("results").innerHTML=
+"<div class='loading'>"+name+
+" anime is temporarily unavailable. Please try again in a moment.</div>";
+
+}
+
 let timer;
 
 document.getElementById("search")
