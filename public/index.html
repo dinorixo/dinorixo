@@ -157,6 +157,321 @@ header{padding:0 12px}
 .logo{font-size:22px}
 .search{max-width:none}
 }
+
+/* ================================
+   DIXORINO 2.0 — MODERN UI
+   ================================ */
+
+:root{
+  --bg:#07070b;
+  --panel:#101018;
+  --panel2:#151520;
+  --accent:#ff3f91;
+  --accent2:#9b5cff;
+  --text:#f7f7fb;
+  --muted:#9292a3;
+  --border:rgba(255,255,255,.08);
+}
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  background:
+    radial-gradient(circle at 15% 0%,rgba(255,63,145,.10),transparent 30%),
+    radial-gradient(circle at 85% 10%,rgba(155,92,255,.10),transparent 28%),
+    var(--bg) !important;
+  color:var(--text) !important;
+}
+
+/* HEADER */
+
+header{
+  height:72px !important;
+  background:rgba(10,10,16,.82) !important;
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--border);
+  padding:0 28px !important;
+  position:sticky;
+  top:0;
+  z-index:100;
+}
+
+.logo{
+  font-size:25px !important;
+  font-weight:950 !important;
+  letter-spacing:-1px;
+  background:linear-gradient(90deg,#ff3f91,#b56cff);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent !important;
+}
+
+header a{
+  color:#d8d8e2 !important;
+  font-weight:600;
+  transition:.2s;
+}
+
+header a:hover{
+  color:#fff !important;
+}
+
+/* MAIN */
+
+main{
+  max-width:1250px !important;
+  padding:30px 22px !important;
+}
+
+/* SEARCH */
+
+input[type="search"],
+input[type="text"]{
+  background:rgba(255,255,255,.055) !important;
+  border:1px solid var(--border) !important;
+  color:#fff !important;
+  border-radius:14px !important;
+  padding:14px 18px !important;
+  outline:none;
+  transition:.25s;
+}
+
+input[type="search"]:focus,
+input[type="text"]:focus{
+  border-color:rgba(255,63,145,.6) !important;
+  box-shadow:0 0 0 4px rgba(255,63,145,.08);
+}
+
+/* CARDS */
+
+.card{
+  background:linear-gradient(
+    145deg,
+    rgba(255,255,255,.075),
+    rgba(255,255,255,.025)
+  ) !important;
+  border:1px solid var(--border);
+  border-radius:16px !important;
+  overflow:hidden;
+  transition:
+    transform .25s ease,
+    box-shadow .25s ease,
+    border-color .25s ease;
+  position:relative;
+}
+
+.card:hover{
+  transform:translateY(-7px);
+  border-color:rgba(255,63,145,.35);
+  box-shadow:
+    0 18px 45px rgba(0,0,0,.45),
+    0 0 30px rgba(255,63,145,.08);
+}
+
+.card img{
+  transition:transform .4s ease;
+}
+
+.card:hover img{
+  transform:scale(1.045);
+}
+
+/* BUTTONS */
+
+button,
+.control,
+.load-more{
+  border:1px solid rgba(255,255,255,.08) !important;
+  border-radius:11px !important;
+  transition:.2s ease !important;
+}
+
+button:hover,
+.control:hover,
+.load-more:hover{
+  background:linear-gradient(90deg,var(--accent),var(--accent2)) !important;
+  color:#fff !important;
+  transform:translateY(-1px);
+}
+
+/* TAGS */
+
+.tag{
+  background:rgba(255,63,145,.10) !important;
+  border:1px solid rgba(255,63,145,.18);
+  color:#ff8cba !important;
+  border-radius:999px !important;
+  padding:5px 10px !important;
+}
+
+/* DETAILS HERO */
+
+.hero{
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255,255,255,.075),
+      rgba(255,255,255,.025)
+    ) !important;
+  border:1px solid var(--border);
+  border-radius:24px !important;
+  padding:25px !important;
+  box-shadow:0 25px 70px rgba(0,0,0,.3);
+  overflow:hidden;
+}
+
+.poster{
+  border-radius:17px !important;
+  box-shadow:0 20px 50px rgba(0,0,0,.5);
+}
+
+.content h1{
+  font-size:clamp(30px,5vw,54px) !important;
+  letter-spacing:-1.5px;
+}
+
+.description{
+  color:#b6b6c3 !important;
+  line-height:1.75 !important;
+}
+
+/* INFO */
+
+.info{
+  background:rgba(255,255,255,.035);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:15px 17px;
+  line-height:1.9;
+  color:#d4d4df;
+}
+
+/* FAVORITE */
+
+.favorite{
+  background:linear-gradient(
+    90deg,
+    var(--accent),
+    var(--accent2)
+  ) !important;
+  color:#fff !important;
+  font-weight:700;
+  border:0 !important;
+  padding:13px 22px !important;
+}
+
+/* TRAILER */
+
+.trailer{
+  margin-top:25px;
+  border-radius:18px;
+  overflow:hidden;
+}
+
+/* EPISODES */
+
+.episodes{
+  gap:10px !important;
+}
+
+.ep{
+  background:#14141e !important;
+  border:1px solid var(--border) !important;
+  color:#ddd !important;
+}
+
+.ep.active,
+.ep:hover{
+  background:linear-gradient(
+    90deg,
+    var(--accent),
+    var(--accent2)
+  ) !important;
+}
+
+/* WATCH PLAYER */
+
+.player-wrap{
+  border:1px solid var(--border);
+  box-shadow:
+    0 25px 70px rgba(0,0,0,.55),
+    0 0 50px rgba(255,63,145,.05);
+}
+
+video{
+  border-radius:14px;
+}
+
+.player-status{
+  background:rgba(5,5,10,.82) !important;
+  border:1px solid var(--border);
+  backdrop-filter:blur(10px);
+}
+
+/* WATCH NOTICE */
+
+.notice{
+  background:rgba(255,255,255,.035) !important;
+  border:1px solid var(--border);
+  color:#9292a3 !important;
+}
+
+/* LOADING */
+
+.loading{
+  color:#aaa !important;
+}
+
+/* MOBILE */
+
+@media(max-width:700px){
+
+  header{
+    height:62px !important;
+    padding:0 15px !important;
+  }
+
+  main{
+    padding:20px 14px !important;
+  }
+
+  .hero{
+    padding:15px !important;
+    border-radius:18px !important;
+  }
+
+  .poster{
+    border-radius:13px !important;
+  }
+
+  .card{
+    border-radius:13px !important;
+  }
+
+}
+
+/* SCROLLBAR */
+
+::-webkit-scrollbar{
+  width:8px;
+}
+
+::-webkit-scrollbar-track{
+  background:#07070b;
+}
+
+::-webkit-scrollbar-thumb{
+  background:#292936;
+  border-radius:20px;
+}
+
+::-webkit-scrollbar-thumb:hover{
+  background:#ff3f91;
+}
+
 </style>
 </head>
 
