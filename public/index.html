@@ -3,468 +3,565 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>DIXORINO</title>
+<title>DIXORINO — Anime</title>
 
 <style>
-*{box-sizing:border-box}
-
-body{
-margin:0;
-background:#08090d;
-color:#fff;
-font-family:Arial,sans-serif
-}
-
-header{
-height:70px;
-background:#10121a;
-display:flex;
-align-items:center;
-gap:20px;
-padding:0 20px;
-position:sticky;
-top:0;
-z-index:10
-}
-
-.logo{
-font-size:27px;
-font-weight:900;
-color:#ff3f91
-}
-
-.search{
-flex:1;
-max-width:500px;
-background:#1b1e28;
-border:0;
-outline:0;
-color:#fff;
-padding:13px 18px;
-border-radius:25px;
-font-size:15px
-}
-
-main{
-max-width:1200px;
-margin:auto;
-padding:20px
-}
-
-.hero{
-padding:35px;
-border-radius:18px;
-margin-bottom:30px;
-background:linear-gradient(135deg,#261225,#11131b)
-}
-
-.hero h1{
-font-size:38px;
-margin:10px 0
-}
-
-.hero p{
-color:#aaa
-}
-
-section{
-margin-top:30px
-}
-
-.section-title{
-display:flex;
-justify-content:space-between;
-align-items:center
-}
-
-.grid{
-display:grid;
-grid-template-columns:repeat(6,1fr);
-gap:14px
-}
-
-.card{
-background:#171a23;
-border-radius:10px;
-overflow:hidden;
-cursor:pointer;
-transition:.2s;
-position:relative
-}
-
-.card:hover{
-transform:translateY(-4px)
-}
-
-.poster{
-width:100%;
-height:250px;
-object-fit:cover;
-display:block;
-background:#1b1e27
-}
-
-.card h3{
-font-size:14px;
-margin:10px;
-white-space:nowrap;
-overflow:hidden;
-text-overflow:ellipsis
-}
-
-.card p{
-font-size:12px;
-color:#888;
-margin:0 10px 12px
-}
-
-.heart{
-position:absolute;
-right:7px;
-top:7px;
-border:0;
-border-radius:50%;
-width:35px;
-height:35px;
-background:#090a0f;
-color:white;
-font-size:19px
-}
-
-.heart.on{
-color:#ff3f91
-}
-
-.loading{
-color:#888;
-padding:20px 0
-}
-
-@media(max-width:1000px){
-.grid{grid-template-columns:repeat(4,1fr)}
-}
-
-@media(max-width:650px){
-.grid{grid-template-columns:repeat(3,1fr)}
-.poster{height:210px}
-.hero h1{font-size:28px}
-}
-
-@media(max-width:450px){
-.grid{grid-template-columns:repeat(2,1fr)}
-.poster{height:240px}
-header{padding:0 12px}
-.logo{font-size:22px}
-.search{max-width:none}
-}
-
-/* ================================
-   DIXORINO 2.0 — MODERN UI
-   ================================ */
 
 :root{
-  --bg:#07070b;
-  --panel:#101018;
-  --panel2:#151520;
-  --accent:#ff3f91;
-  --accent2:#9b5cff;
-  --text:#f7f7fb;
-  --muted:#9292a3;
-  --border:rgba(255,255,255,.08);
+  --bg:#08080c;
+  --panel:#111118;
+  --panel2:#171720;
+  --pink:#ff3f91;
+  --purple:#9b5cff;
+  --text:#fff;
+  --muted:#92929f;
 }
 
 *{
   box-sizing:border-box;
 }
 
+html{
+  scroll-behavior:smooth;
+}
+
 body{
+  margin:0;
   background:
-    radial-gradient(circle at 15% 0%,rgba(255,63,145,.10),transparent 30%),
-    radial-gradient(circle at 85% 10%,rgba(155,92,255,.10),transparent 28%),
-    var(--bg) !important;
-  color:var(--text) !important;
+    radial-gradient(circle at 10% 0%,rgba(255,63,145,.10),transparent 25%),
+    radial-gradient(circle at 90% 20%,rgba(125,70,255,.08),transparent 25%),
+    var(--bg);
+  color:var(--text);
+  font-family:Arial,Helvetica,sans-serif;
 }
 
 /* HEADER */
 
 header{
-  height:72px !important;
-  background:rgba(10,10,16,.82) !important;
+  height:68px;
+  display:flex;
+  align-items:center;
+  gap:25px;
+  padding:0 5%;
+  background:rgba(8,8,12,.82);
   backdrop-filter:blur(18px);
   -webkit-backdrop-filter:blur(18px);
-  border-bottom:1px solid var(--border);
-  padding:0 28px !important;
+  border-bottom:1px solid rgba(255,255,255,.06);
   position:sticky;
   top:0;
   z-index:100;
 }
 
 .logo{
-  font-size:25px !important;
-  font-weight:950 !important;
-  letter-spacing:-1px;
+  font-size:25px;
+  font-weight:950;
+  letter-spacing:-1.2px;
   background:linear-gradient(90deg,#ff3f91,#b56cff);
   -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent !important;
+  color:transparent;
+  white-space:nowrap;
 }
 
-header a{
-  color:#d8d8e2 !important;
+.nav{
+  display:flex;
+  gap:20px;
+}
+
+.nav a{
+  color:#aaa;
+  text-decoration:none;
+  font-size:14px;
   font-weight:600;
+}
+
+.nav a:hover{
+  color:white;
+}
+
+.search-wrap{
+  margin-left:auto;
+  width:min(360px,40vw);
+  position:relative;
+}
+
+.search{
+  width:100%;
+  height:42px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:22px;
+  background:#15151d;
+  color:white;
+  outline:none;
+  padding:0 18px 0 42px;
+  font-size:14px;
+}
+
+.search:focus{
+  border-color:rgba(255,63,145,.5);
+  box-shadow:0 0 0 4px rgba(255,63,145,.07);
+}
+
+.search-icon{
+  position:absolute;
+  left:16px;
+  top:12px;
+  color:#777;
+}
+
+/* HERO */
+
+.hero{
+  min-height:510px;
+  position:relative;
+  overflow:hidden;
+  display:flex;
+  align-items:flex-end;
+  margin:0 0 35px;
+  padding:55px 6%;
+  background:
+    linear-gradient(90deg,
+      #08080c 0%,
+      rgba(8,8,12,.94) 30%,
+      rgba(8,8,12,.48) 65%,
+      rgba(8,8,12,.2) 100%
+    ),
+    linear-gradient(0deg,
+      #08080c 0%,
+      transparent 55%
+    ),
+    url("https://s4.anilist.co/file/anilistcdn/media/anime/banner/20916-6nR8pQ8p8xXz.jpg")
+    center/cover;
+}
+
+.hero-content{
+  max-width:620px;
+  position:relative;
+  z-index:2;
+}
+
+.hero-label{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  color:#ff78b4;
+  font-size:13px;
+  font-weight:800;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+}
+
+.hero h1{
+  font-size:clamp(42px,6vw,76px);
+  line-height:.95;
+  margin:14px 0;
+  letter-spacing:-3px;
+}
+
+.hero p{
+  color:#b8b8c3;
+  line-height:1.65;
+  max-width:580px;
+  font-size:15px;
+}
+
+.hero-meta{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  margin:20px 0;
+}
+
+.hero-meta span{
+  padding:7px 11px;
+  border-radius:7px;
+  background:rgba(255,255,255,.08);
+  color:#ddd;
+  font-size:12px;
+}
+
+.hero-meta .score{
+  color:#ffd45c;
+}
+
+.hero-buttons{
+  display:flex;
+  gap:10px;
+}
+
+.hero-btn{
+  border:0;
+  padding:13px 20px;
+  border-radius:9px;
+  cursor:pointer;
+  color:white;
+  font-weight:800;
+  text-decoration:none;
+  font-size:14px;
+}
+
+.watch-btn{
+  background:linear-gradient(90deg,var(--pink),var(--purple));
+}
+
+.browse-btn{
+  background:rgba(255,255,255,.10);
+  border:1px solid rgba(255,255,255,.1);
+}
+
+/* CONTENT */
+
+main{
+  max-width:1450px;
+  margin:auto;
+  padding:0 5% 70px;
+}
+
+section{
+  margin:38px 0;
+}
+
+.section-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:16px;
+}
+
+.section-head h2{
+  margin:0;
+  font-size:22px;
+  letter-spacing:-.5px;
+}
+
+.section-head a{
+  color:#888;
+  font-size:13px;
+  text-decoration:none;
+}
+
+.section-head a:hover{
+  color:var(--pink);
+}
+
+/* TRENDING */
+
+.trending{
+  display:flex;
+  gap:15px;
+  overflow-x:auto;
+  padding:5px 2px 15px;
+  scrollbar-width:none;
+}
+
+.trending::-webkit-scrollbar{
+  display:none;
+}
+
+.trend{
+  min-width:190px;
+  height:275px;
+  position:relative;
+  border-radius:13px;
+  overflow:hidden;
+  cursor:pointer;
+  background:#15151d;
+}
+
+.trend img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  transition:.35s;
+}
+
+.trend:hover img{
+  transform:scale(1.06);
+}
+
+.trend::after{
+  content:"";
+  position:absolute;
+  inset:35% 0 0;
+  background:linear-gradient(transparent,rgba(0,0,0,.95));
+}
+
+.trend-info{
+  position:absolute;
+  left:14px;
+  right:10px;
+  bottom:13px;
+  z-index:2;
+}
+
+.trend-number{
+  font-size:32px;
+  font-weight:950;
+  color:white;
+  opacity:.9;
+}
+
+.trend-title{
+  font-size:14px;
+  font-weight:800;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+/* GRID */
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:17px;
+}
+
+.card{
+  background:#111118;
+  border:1px solid rgba(255,255,255,.055);
+  border-radius:12px;
+  overflow:hidden;
+  cursor:pointer;
+  position:relative;
+  transition:.25s;
+}
+
+.card:hover{
+  transform:translateY(-6px);
+  border-color:rgba(255,63,145,.35);
+  box-shadow:0 20px 45px rgba(0,0,0,.45);
+}
+
+.card .poster{
+  width:100%;
+  aspect-ratio:2/3;
+  height:auto;
+  object-fit:cover;
+  display:block;
+  background:#191921;
+  transition:.35s;
+}
+
+.card:hover .poster{
+  transform:scale(1.025);
+}
+
+.card-info{
+  padding:11px;
+}
+
+.card h3{
+  margin:0 0 7px;
+  font-size:14px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.card p{
+  margin:0;
+  color:#777;
+  font-size:11px;
+}
+
+.card-rating{
+  position:absolute;
+  left:8px;
+  top:8px;
+  background:rgba(0,0,0,.78);
+  backdrop-filter:blur(8px);
+  border-radius:6px;
+  padding:5px 7px;
+  color:#ffd45c;
+  font-size:11px;
+  font-weight:800;
+}
+
+.heart{
+  position:absolute;
+  right:8px;
+  top:8px;
+  z-index:5;
+  width:32px;
+  height:32px;
+  border:0;
+  border-radius:50%;
+  background:rgba(0,0,0,.72);
+  color:white;
+  cursor:pointer;
+  font-size:17px;
+}
+
+.heart.on{
+  color:#ff3f91;
+}
+
+/* GENRES */
+
+.genres{
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+}
+
+.genre{
+  border:1px solid rgba(255,255,255,.08);
+  background:#111118;
+  color:#aaa;
+  padding:9px 14px;
+  border-radius:20px;
+  cursor:pointer;
   transition:.2s;
 }
 
-header a:hover{
-  color:#fff !important;
-}
-
-/* MAIN */
-
-main{
-  max-width:1250px !important;
-  padding:30px 22px !important;
+.genre:hover{
+  color:white;
+  border-color:rgba(255,63,145,.4);
+  background:rgba(255,63,145,.1);
 }
 
 /* SEARCH */
 
-input[type="search"],
-input[type="text"]{
-  background:rgba(255,255,255,.055) !important;
-  border:1px solid var(--border) !important;
-  color:#fff !important;
-  border-radius:14px !important;
-  padding:14px 18px !important;
-  outline:none;
-  transition:.25s;
+#searchSection{
+  display:none;
 }
 
-input[type="search"]:focus,
-input[type="text"]:focus{
-  border-color:rgba(255,63,145,.6) !important;
-  box-shadow:0 0 0 4px rgba(255,63,145,.08);
+#searchSection.active{
+  display:block;
 }
-
-/* CARDS */
-
-.card{
-  background:linear-gradient(
-    145deg,
-    rgba(255,255,255,.075),
-    rgba(255,255,255,.025)
-  ) !important;
-  border:1px solid var(--border);
-  border-radius:16px !important;
-  overflow:hidden;
-  transition:
-    transform .25s ease,
-    box-shadow .25s ease,
-    border-color .25s ease;
-  position:relative;
-}
-
-.card:hover{
-  transform:translateY(-7px);
-  border-color:rgba(255,63,145,.35);
-  box-shadow:
-    0 18px 45px rgba(0,0,0,.45),
-    0 0 30px rgba(255,63,145,.08);
-}
-
-.card img{
-  transition:transform .4s ease;
-}
-
-.card:hover img{
-  transform:scale(1.045);
-}
-
-/* BUTTONS */
-
-button,
-.control,
-.load-more{
-  border:1px solid rgba(255,255,255,.08) !important;
-  border-radius:11px !important;
-  transition:.2s ease !important;
-}
-
-button:hover,
-.control:hover,
-.load-more:hover{
-  background:linear-gradient(90deg,var(--accent),var(--accent2)) !important;
-  color:#fff !important;
-  transform:translateY(-1px);
-}
-
-/* TAGS */
-
-.tag{
-  background:rgba(255,63,145,.10) !important;
-  border:1px solid rgba(255,63,145,.18);
-  color:#ff8cba !important;
-  border-radius:999px !important;
-  padding:5px 10px !important;
-}
-
-/* DETAILS HERO */
-
-.hero{
-  background:
-    linear-gradient(
-      135deg,
-      rgba(255,255,255,.075),
-      rgba(255,255,255,.025)
-    ) !important;
-  border:1px solid var(--border);
-  border-radius:24px !important;
-  padding:25px !important;
-  box-shadow:0 25px 70px rgba(0,0,0,.3);
-  overflow:hidden;
-}
-
-.poster{
-  border-radius:17px !important;
-  box-shadow:0 20px 50px rgba(0,0,0,.5);
-}
-
-.content h1{
-  font-size:clamp(30px,5vw,54px) !important;
-  letter-spacing:-1.5px;
-}
-
-.description{
-  color:#b6b6c3 !important;
-  line-height:1.75 !important;
-}
-
-/* INFO */
-
-.info{
-  background:rgba(255,255,255,.035);
-  border:1px solid var(--border);
-  border-radius:14px;
-  padding:15px 17px;
-  line-height:1.9;
-  color:#d4d4df;
-}
-
-/* FAVORITE */
-
-.favorite{
-  background:linear-gradient(
-    90deg,
-    var(--accent),
-    var(--accent2)
-  ) !important;
-  color:#fff !important;
-  font-weight:700;
-  border:0 !important;
-  padding:13px 22px !important;
-}
-
-/* TRAILER */
-
-.trailer{
-  margin-top:25px;
-  border-radius:18px;
-  overflow:hidden;
-}
-
-/* EPISODES */
-
-.episodes{
-  gap:10px !important;
-}
-
-.ep{
-  background:#14141e !important;
-  border:1px solid var(--border) !important;
-  color:#ddd !important;
-}
-
-.ep.active,
-.ep:hover{
-  background:linear-gradient(
-    90deg,
-    var(--accent),
-    var(--accent2)
-  ) !important;
-}
-
-/* WATCH PLAYER */
-
-.player-wrap{
-  border:1px solid var(--border);
-  box-shadow:
-    0 25px 70px rgba(0,0,0,.55),
-    0 0 50px rgba(255,63,145,.05);
-}
-
-video{
-  border-radius:14px;
-}
-
-.player-status{
-  background:rgba(5,5,10,.82) !important;
-  border:1px solid var(--border);
-  backdrop-filter:blur(10px);
-}
-
-/* WATCH NOTICE */
-
-.notice{
-  background:rgba(255,255,255,.035) !important;
-  border:1px solid var(--border);
-  color:#9292a3 !important;
-}
-
-/* LOADING */
 
 .loading{
-  color:#aaa !important;
+  color:#777;
+  padding:25px 0;
 }
 
-/* MOBILE */
+/* MOBILE NAV */
 
-@media(max-width:700px){
+.mobile-nav{
+  display:none;
+}
 
-  header{
-    height:62px !important;
-    padding:0 15px !important;
+/* RESPONSIVE */
+
+@media(max-width:1100px){
+  .grid{
+    grid-template-columns:repeat(5,1fr);
+  }
+}
+
+@media(max-width:850px){
+  .grid{
+    grid-template-columns:repeat(4,1fr);
   }
 
-  main{
-    padding:20px 14px !important;
+  .nav{
+    display:none;
   }
 
   .hero{
-    padding:15px !important;
-    border-radius:18px !important;
+    min-height:450px;
   }
-
-  .poster{
-    border-radius:13px !important;
-  }
-
-  .card{
-    border-radius:13px !important;
-  }
-
 }
 
-/* SCROLLBAR */
+@media(max-width:600px){
+
+  header{
+    height:60px;
+    padding:0 14px;
+    gap:12px;
+  }
+
+  .logo{
+    font-size:21px;
+  }
+
+  .search-wrap{
+    width:auto;
+    flex:1;
+  }
+
+  main{
+    padding:0 13px 85px;
+  }
+
+  .hero{
+    min-height:440px;
+    margin-left:-13px;
+    margin-right:-13px;
+    padding:35px 20px;
+    background:
+      linear-gradient(0deg,#08080c 5%,rgba(8,8,12,.35) 75%),
+      url("https://s4.anilist.co/file/anilistcdn/media/anime/banner/20916-6nR8pQ8p8xXz.jpg")
+      center/cover;
+  }
+
+  .hero h1{
+    font-size:40px;
+    letter-spacing:-2px;
+  }
+
+  .hero p{
+    font-size:13px;
+  }
+
+  .grid{
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+  }
+
+  .trend{
+    min-width:145px;
+    height:215px;
+  }
+
+  .section-head h2{
+    font-size:19px;
+  }
+
+  .mobile-nav{
+    position:fixed;
+    display:flex;
+    bottom:0;
+    left:0;
+    right:0;
+    height:62px;
+    background:rgba(12,12,18,.94);
+    backdrop-filter:blur(18px);
+    border-top:1px solid rgba(255,255,255,.07);
+    z-index:200;
+    justify-content:space-around;
+    align-items:center;
+  }
+
+  .mobile-nav a{
+    color:#777;
+    text-decoration:none;
+    font-size:10px;
+    text-align:center;
+  }
+
+  .mobile-nav a span{
+    display:block;
+    font-size:20px;
+    margin-bottom:2px;
+  }
+
+  .mobile-nav a:hover{
+    color:#ff3f91;
+  }
+}
 
 ::-webkit-scrollbar{
-  width:8px;
+  width:7px;
+  height:7px;
 }
 
 ::-webkit-scrollbar-track{
-  background:#07070b;
+  background:#08080c;
 }
 
 ::-webkit-scrollbar-thumb{
-  background:#292936;
+  background:#292932;
   border-radius:20px;
 }
 
@@ -481,33 +578,83 @@ video{
 
 <div class="logo">DIXORINO</div>
 
+<nav class="nav">
+<a href="/">Home</a>
+<a href="#trending">Trending</a>
+<a href="#popular">Popular</a>
+<a href="#genres">Genres</a>
+</nav>
+
+<div class="search-wrap">
+<span class="search-icon">⌕</span>
 <input
 id="search"
 class="search"
 placeholder="Search anime..."
 autocomplete="off">
+</div>
 
 </header>
 
-<main>
-
 <div class="hero">
 
-<div style="color:#ff3f91;font-weight:bold">
-WELCOME TO DIXORINO
+<div class="hero-content">
+
+<div class="hero-label">
+✦ FEATURED ANIME
 </div>
 
-<h1>Watch. Discover. Enjoy.</h1>
+<h1>Frieren</h1>
+
+<div class="hero-meta">
+<span class="score">⭐ 9.3</span>
+<span>TV</span>
+<span>28 Episodes</span>
+<span>Fantasy</span>
+</div>
 
 <p>
-Discover thousands of anime and find your next favorite.
+After defeating the Demon King, the elven mage Frieren begins a new journey.
+Years later, she starts to understand the precious memories and friendships
+she once took for granted.
 </p>
 
+<div class="hero-buttons">
+
+<a
+class="hero-btn watch-btn"
+href="details.html?anilist=154587">
+▶ Watch Now
+</a>
+
+<a class="hero-btn browse-btn" href="#popular">
+Browse Anime
+</a>
+
 </div>
+
+</div>
+
+</div>
+
+<main>
+
+<section id="trending">
+
+<div class="section-head">
+<h2>🔥 Trending Now</h2>
+<a href="#popular">View all →</a>
+</div>
+
+<div id="trendingGrid" class="trending">
+<div class="loading">Loading trending anime...</div>
+</div>
+
+</section>
 
 <section id="continueSection" style="display:none">
 
-<div class="section-title">
+<div class="section-head">
 <h2>🕒 Continue Watching</h2>
 </div>
 
@@ -517,7 +664,7 @@ Discover thousands of anime and find your next favorite.
 
 <section id="favoritesSection" style="display:none">
 
-<div class="section-title">
+<div class="section-head">
 <h2>❤️ My Favorites</h2>
 </div>
 
@@ -525,22 +672,22 @@ Discover thousands of anime and find your next favorite.
 
 </section>
 
-<section>
+<section id="popular">
 
-<div class="section-title">
+<div class="section-head">
 <h2>🔥 Popular Anime</h2>
+<a href="#popular">Explore →</a>
 </div>
 
-<div id="popular" class="grid">
+<div id="popularGrid" class="grid">
 <div class="loading">Loading...</div>
 </div>
-
 
 </section>
 
 <section>
 
-<div class="section-title">
+<div class="section-head">
 <h2>🆕 Latest Anime</h2>
 </div>
 
@@ -548,17 +695,23 @@ Discover thousands of anime and find your next favorite.
 <div class="loading">Loading...</div>
 </div>
 
+</section>
+
+<section id="genres">
+
+<div class="section-head">
+<h2>🎭 Browse by Genre</h2>
+</div>
+
+<div id="genresGrid" class="genres"></div>
 
 </section>
 
-<section>
-<h2>🎭 Browse Genres</h2>
-<div id="genres" style="display:flex;flex-wrap:wrap;gap:10px"></div>
-</section>
+<section id="searchSection">
 
-<section id="searchSection" style="display:none">
-
+<div class="section-head">
 <h2>🔎 Search Results</h2>
+</div>
 
 <div id="results" class="grid"></div>
 
@@ -566,6 +719,29 @@ Discover thousands of anime and find your next favorite.
 
 </main>
 
+<div class="mobile-nav">
+<a href="/">
+<span>⌂</span>
+Home
+</a>
+
+<a href="#trending">
+<span>🔥</span>
+Trending
+</a>
+
+<a href="#genres">
+<span>◈</span>
+Genres
+</a>
+
+<a href="#favoritesSection">
+<span>♡</span>
+Favorites
+</a>
+</div>
+
+<script>
 <script>
 
 const API="https://api.jikan.moe/v4";
@@ -708,12 +884,12 @@ await getAnime(
 API+"/top/anime?limit=12"
 );
 
-document.getElementById("popular").innerHTML=
+document.getElementById("popularGrid").innerHTML=
 data.map(createCard).join("");
 
 }catch(e){
 
-document.getElementById("popular").innerHTML=
+document.getElementById("popularGrid").innerHTML=
 "<div class='loading'>Unable to load anime.</div>";
 
 }
@@ -1018,7 +1194,7 @@ style="display:flex;align-items:center;justify-content:center;font-size:40px">
 }
 
 const genreList=[["Action",1],["Adventure",2],["Comedy",4],["Fantasy",10],["Romance",22],["Sports",30],["Horror",14],["Mystery",7],["Sci-Fi",24],["Supernatural",37]];
-document.getElementById("genres").innerHTML=genreList.map(g=>`<button style="background:#191c26;color:white;border:0;padding:11px 16px;border-radius:20px" onclick="openGenre(${g[1]},'${g[0]}')">${g[0]}</button>`).join("");
+document.getElementById("genresGrid").innerHTML=genreList.map(g=>`<button style="background:#191c26;color:white;border:0;padding:11px 16px;border-radius:20px" onclick="openGenre(${g[1]},'${g[0]}')">${g[0]}</button>`).join("");
 async function openGenre(id,name){
   const section=document.getElementById("searchSection");
   const results=document.getElementById("results");
@@ -1080,7 +1256,86 @@ loadLatest();
 loadFavorites();
 loadContinue();
 
-</script>
 
+
+/* DIXORINO HOME UI */
+
+function makeTrendingCard(a,index){
+
+const id=a.mal_id;
+
+const title=a.title||"Unknown";
+
+const image=
+a.images?.jpg?.large_image_url||
+a.images?.jpg?.image_url||
+"";
+
+return `
+<div class="trend"
+onclick="openAnime(${id})">
+
+<img
+src="${image}"
+loading="lazy"
+alt="${escapeHTML(title)}">
+
+<div class="trend-info">
+
+<div class="trend-number">
+${String(index+1).padStart(2,"0")}
+</div>
+
+<div class="trend-title">
+${escapeHTML(title)}
+</div>
+
+</div>
+
+</div>
+`;
+
+}
+
+async function loadTrending(){
+
+try{
+
+const r=await fetch(
+API+"/top/anime?limit=12"
+);
+
+if(!r.ok)throw new Error("Trending failed");
+
+const x=await r.json();
+
+const data=x.data||[];
+
+const box=document.getElementById("trendingGrid");
+
+if(!data.length){
+box.innerHTML="<div class='loading'>No trending anime.</div>";
+return;
+}
+
+box.innerHTML=data.map(
+(a,i)=>makeTrendingCard(a,i)
+).join("");
+
+}catch(e){
+
+console.error("Trending:",e);
+
+document.getElementById("trendingGrid").innerHTML=
+"<div class='loading'>Trending anime unavailable.</div>";
+
+}
+
+}
+
+loadTrending();
+
+
+</script>
 </body>
 </html>
