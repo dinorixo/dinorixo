@@ -1710,9 +1710,15 @@ async function loadTrending(){
   }
 }
 
-loadPopular();
-loadLatest();
 loadTrending();
+
+setTimeout(()=>{
+  loadPopular();
+},1200);
+
+setTimeout(()=>{
+  loadLatest();
+},2400);
 
 
 </script>
