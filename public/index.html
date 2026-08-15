@@ -418,74 +418,79 @@ async function searchAnime(query){
   document.getElementById("results").innerHTML=
     "<div class='loading'>Searching...</div>";
 
-  const q=query.toLowerCase();
-
   try{
 
-    /* Search local cache first */
-    let cached=[];
-
-    try{
-      const cacheResponse=await fetch("data/search-cache.json");
-      if(cacheResponse.ok){
-        const cache=await cacheResponse.json();
-        cached=Object.values(cache).filter(a=>{
-          const title=(a.title||"").toLowerCase();
-          const english=(a.title_english||"").toLowerCase();
-          return title.includes(q)||english.includes(q);
-        });
+    const graphql = `
+      query ($search: String) {
+        Page(page: 1, perPage: 24) {
+          media(search: $search, type: ANIME, sort: SEARCH_MATCH) {
+            id
+            idMal
+            title {
+              romaji
+              english
+              native
+            }
+            coverImage {
+              large
+              medium
+            }
+            averageScore
+            episodes
+            genres
+            status
+          }
+        }
       }
-    }catch(e){
-      console.log("Local cache unavailable");
-    }
+    `;
 
-    if(cached.length){
-      document.getElementById("results").innerHTML=
-        cached.slice(0,24).map(createCard).join("");
-      return;
-    }
-
-    /* Ask Jikan if cache has no result */
-    const response=await fetch(
-      API+"/anime?q="+encodeURIComponent(query)+"&limit=24"
-    );
+    const response = await fetch("https://graphql.anilist.co", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify({
+        query: graphql,
+        variables: { search: query }
+      })
+    });
 
     if(!response.ok){
-      throw new Error("Search API returned "+response.status);
+      throw new Error("AniList search failed: "+response.status);
     }
 
-    const json=await response.json();
-    const data=json.data||[];
+    const json = await response.json();
+    const data = json.data?.Page?.media || [];
 
-    if(!data.length){
+    const converted = data.map(a => ({
+      mal_id: a.idMal || a.id,
+      title: a.title?.english || a.title?.romaji || a.title?.native || "Unknown",
+      images: {
+        jpg: {
+          large_image_url: a.coverImage?.large || a.coverImage?.medium || ""
+        }
+      },
+      score: a.averageScore ? a.averageScore / 10 : null,
+      episodes: a.episodes,
+      genres: (a.genres || []).map((name, i) => ({
+        mal_id: 0,
+        name
+      }))
+    }));
+
+    if(!converted.length){
       document.getElementById("results").innerHTML=
         "<div class='loading'>No anime found.</div>";
       return;
     }
 
-    /* Save successful results to local cache */
-    try{
-      const cacheResponse=await fetch("data/search-cache.json");
-      const cache=cacheResponse.ok ? await cacheResponse.json() : {};
-
-      data.forEach(anime=>{
-        if(anime && anime.mal_id){
-          cache[String(anime.mal_id)]=anime;
-        }
-      });
-
-      console.log("Search results loaded:",data.length);
-    }catch(e){
-      console.log("Cache is read-only on this hosting setup");
-    }
-
-    /* Display results */
     document.getElementById("results").innerHTML=
-      data.map(createCard).join("");
+      converted.map(createCard).join("");
 
-  }catch(e){
+  }catch(error){
 
-    console.error(e);
+    console.error(error);
 
     document.getElementById("results").innerHTML=
       "<div class='loading'>Search is temporarily unavailable. Please try again.</div>";
