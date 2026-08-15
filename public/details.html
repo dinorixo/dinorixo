@@ -55,24 +55,104 @@ h1{font-size:27px}
 
 <script>
 
-const id=new URLSearchParams(location.search).get("id");
+const params=new URLSearchParams(location.search);
+
+const id=params.get("id");
+const anilistId=params.get("anilist");
+
 const API="https://api.jikan.moe/v4";
+const ANILIST="https://graphql.anilist.co";
 
 let animeData=null;
 
 async function loadAnime(){
 
-if(!id){
+if(!id && !anilistId){
 document.getElementById("status").textContent="Anime not selected.";
 return;
 }
 
 try{
 
+if(anilistId){
+
+const query=`
+query ($id: Int) {
+  Media(id: $id, type: ANIME) {
+    id
+    idMal
+    title {
+      romaji
+      english
+      native
+    }
+    description
+    averageScore
+    episodes
+    status
+    type
+    season
+    seasonYear
+    genres
+    studios {
+      nodes {
+        name
+      }
+    }
+    coverImage {
+      large
+      medium
+    }
+  }
+}`;
+
+const r=await fetch(ANILIST,{
+  method:"POST",
+  headers:{
+    "Content-Type":"application/json",
+    "Accept":"application/json"
+  },
+  body:JSON.stringify({
+    query:query,
+    variables:{id:Number(anilistId)}
+  })
+});
+
+const x=await r.json();
+
+if(x.errors || !x.data?.Media){
+  throw new Error("AniList details unavailable");
+}
+
+const a=x.data.Media;
+
+animeData={
+  mal_id:a.idMal,
+  title:a.title?.english||a.title?.romaji||a.title?.native||"Unknown",
+  synopsis:a.description||"No description available.",
+  score:a.averageScore ? a.averageScore/10 : null,
+  episodes:a.episodes,
+  status:a.status,
+  type:a.type,
+  season:a.season,
+  year:a.seasonYear,
+  genres:(a.genres||[]).map(name=>({name:name})),
+  studios:(a.studios?.nodes||[]).map(studio=>({name:studio.name})),
+  images:{
+    jpg:{
+      large_image_url:a.coverImage?.large||a.coverImage?.medium||""
+    }
+  }
+};
+
+}else{
+
 const r=await fetch(API+"/anime/"+id);
 const x=await r.json();
 
 animeData=x.data;
+
+}
 
 const a=animeData;
 
@@ -148,80 +228,118 @@ document.getElementById("status").textContent=
 
 async function loadTrailer(){
 
-try{
+  // Trailer loading is optional.
+  // Don't let a missing trailer break the details page.
 
-const r=await fetch(API+"/anime/"+id+"/videos");
-const x=await r.json();
+  try{
 
-const promo=x.data?.promo?.[0] ||
-            x.data?.promos?.[0];
+    if(!animeData?.mal_id){
+      return;
+    }
 
-if(promo?.trailer?.embed_url){
+    const r=await fetch(
+      API+"/anime/"+animeData.mal_id+"/videos"
+    );
 
-document.getElementById("trailer").innerHTML=`
+    if(!r.ok)return;
 
-<h2>🎬 Trailer</h2>
+    const x=await r.json();
 
-<iframe
-src="${promo.trailer.embed_url}"
-allowfullscreen>
-</iframe>
-`;
+    const promo=
+      x.data?.promo?.[0] ||
+      x.data?.promos?.[0];
+
+    if(promo?.trailer?.embed_url){
+
+      document.getElementById("trailer").innerHTML=`
+
+        <h2>🎬 Trailer</h2>
+
+        <iframe
+          src="${promo.trailer.embed_url}"
+          allowfullscreen>
+        </iframe>
+
+      `;
+
+    }
+
+  }catch(e){
+
+    console.log("No trailer available");
+
+  }
 
 }
 
-}catch(e){
-
-console.log("No trailer available");
-
-}
-
-}
 
 async function loadEpisodes(){
 
-try{
+  const box=document.getElementById("episodes");
 
-const r=await fetch(API+"/anime/"+id+"/episodes");
-const x=await r.json();
+  // AniList doesn't provide streaming episode lists.
+  // If we have a MAL ID, try Jikan.
+  if(!animeData?.mal_id){
 
-const episodes=x.data||[];
-const box=document.getElementById("episodes");
+    box.innerHTML=
+      "<div class='loading'>Episode information unavailable for this anime.</div>";
 
-if(!episodes.length){
+    return;
 
-box.innerHTML=
-"<div class='loading'>No episode information available.</div>";
-return;
+  }
+
+  try{
+
+    const r=await fetch(
+      API+"/anime/"+animeData.mal_id+"/episodes"
+    );
+
+    if(!r.ok){
+      throw new Error("Episode API failed");
+    }
+
+    const x=await r.json();
+
+    const episodes=x.data||[];
+
+    if(!episodes.length){
+
+      box.innerHTML=
+        "<div class='loading'>No episode information available.</div>";
+
+      return;
+
+    }
+
+    box.innerHTML=episodes.map(ep=>`
+
+      <button class="ep"
+        onclick="openEpisode(${ep.mal_id})">
+        Episode ${ep.mal_id}
+      </button>
+
+    `).join("");
+
+  }catch(e){
+
+    console.log("Episodes unavailable",e);
+
+    box.innerHTML=
+      "<div class='loading'>Episode information unavailable.</div>";
+
+  }
 
 }
 
-box.innerHTML=episodes.map(ep=>`
-
-<button class="ep"
-onclick="openEpisode(${ep.mal_id})">
-Episode ${ep.mal_id}
-</button>
-
-`).join("");
-
-}catch(e){
-
-document.getElementById("episodes").innerHTML=
-"<div class='loading'>Episode information unavailable.</div>";
-
-}
-
-}
 
 function openEpisode(number){
 
-location.href=
-"watch.html?anime="+
-encodeURIComponent(animeData.title)+
-"&episode="+number+
-"&id="+id+
-"&total="+(animeData.episodes||12);
+  location.href=
+    "watch.html?anime="+
+    encodeURIComponent(animeData.title)+
+    "&episode="+number+
+    "&id="+(animeData.mal_id||id)+
+    "&total="+(animeData.episodes||12);
 
 }
 

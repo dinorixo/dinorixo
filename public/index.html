@@ -289,6 +289,7 @@ favorites.includes(id);
 return `
 
 <div class="card"
+data-anilist-id="${a.anilist_id||""}"
 onclick="openAnime(${id})">
 
 <button
@@ -321,8 +322,29 @@ loading="lazy">
 
 function openAnime(id){
 
+const card=document.querySelector(
+'.card[onclick="openAnime('+id+')"]'
+);
+
+const anilistId=card?.dataset?.anilistId||"";
+
+if(anilistId){
+
 location.href=
-"details.html?id="+id;
+"details.html?anilist="+
+encodeURIComponent(anilistId);
+
+return;
+
+}
+
+if(id){
+
+location.href=
+"details.html?id="+
+encodeURIComponent(id);
+
+}
 
 }
 
@@ -503,7 +525,8 @@ async function searchAnime(query, append=false){
     searchHasNext=!!page?.pageInfo?.hasNextPage;
 
     const converted=data.map(a => ({
-      mal_id: a.idMal || a.id,
+      mal_id: a.idMal || null,
+      anilist_id: a.id,
       title:
         a.title?.english ||
         a.title?.romaji ||
