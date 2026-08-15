@@ -7,37 +7,240 @@
 
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#08090d;color:#fff;font-family:Arial,sans-serif}
-header{height:70px;background:#10121a;display:flex;align-items:center;gap:20px;padding:0 20px;position:sticky;top:0;z-index:5}
-.logo{font-size:27px;font-weight:900;color:#ff3f91}
-.search{flex:1;max-width:450px;background:#1b1e28;border:0;outline:0;color:white;padding:13px 18px;border-radius:25px;font-size:15px}
-main{max-width:1200px;margin:auto;padding:25px}
-h1,h2{margin-top:25px}
-.status{color:#888;margin:10px 0 20px}
-.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:15px}
-.card{background:#171a23;border-radius:12px;overflow:hidden;cursor:pointer;transition:.2s}
-.card:hover{transform:translateY(-4px)}
-.poster{width:100%;height:260px;object-fit:cover;background:#191c25}
-.card h3{font-size:16px;margin:10px 12px 5px}
-.card p{color:#999;font-size:13px;margin:0 12px 15px}
-@media(max-width:800px){.grid{grid-template-columns:repeat(3,1fr)}.poster{height:220px}}
-@media(max-width:500px){.grid{grid-template-columns:repeat(2,1fr)}.poster{height:240px}main{padding:15px}}
+
+body{
+margin:0;
+background:#08090d;
+color:#fff;
+font-family:Arial,sans-serif
+}
+
+header{
+height:70px;
+background:#10121a;
+display:flex;
+align-items:center;
+gap:20px;
+padding:0 20px;
+position:sticky;
+top:0;
+z-index:10
+}
+
+.logo{
+font-size:27px;
+font-weight:900;
+color:#ff3f91
+}
+
+.search{
+flex:1;
+max-width:500px;
+background:#1b1e28;
+border:0;
+outline:0;
+color:#fff;
+padding:13px 18px;
+border-radius:25px;
+font-size:15px
+}
+
+main{
+max-width:1200px;
+margin:auto;
+padding:20px
+}
+
+.hero{
+padding:35px;
+border-radius:18px;
+margin-bottom:30px;
+background:linear-gradient(135deg,#261225,#11131b)
+}
+
+.hero h1{
+font-size:38px;
+margin:10px 0
+}
+
+.hero p{
+color:#aaa
+}
+
+section{
+margin-top:30px
+}
+
+.section-title{
+display:flex;
+justify-content:space-between;
+align-items:center
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(6,1fr);
+gap:14px
+}
+
+.card{
+background:#171a23;
+border-radius:10px;
+overflow:hidden;
+cursor:pointer;
+transition:.2s;
+position:relative
+}
+
+.card:hover{
+transform:translateY(-4px)
+}
+
+.poster{
+width:100%;
+height:250px;
+object-fit:cover;
+display:block;
+background:#1b1e27
+}
+
+.card h3{
+font-size:14px;
+margin:10px;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis
+}
+
+.card p{
+font-size:12px;
+color:#888;
+margin:0 10px 12px
+}
+
+.heart{
+position:absolute;
+right:7px;
+top:7px;
+border:0;
+border-radius:50%;
+width:35px;
+height:35px;
+background:#090a0f;
+color:white;
+font-size:19px
+}
+
+.heart.on{
+color:#ff3f91
+}
+
+.loading{
+color:#888;
+padding:20px 0
+}
+
+@media(max-width:1000px){
+.grid{grid-template-columns:repeat(4,1fr)}
+}
+
+@media(max-width:650px){
+.grid{grid-template-columns:repeat(3,1fr)}
+.poster{height:210px}
+.hero h1{font-size:28px}
+}
+
+@media(max-width:450px){
+.grid{grid-template-columns:repeat(2,1fr)}
+.poster{height:240px}
+header{padding:0 12px}
+.logo{font-size:22px}
+.search{max-width:none}
+}
 </style>
 </head>
 
 <body>
 
 <header>
+
 <div class="logo">DIXORINO</div>
-<input id="search" class="search" placeholder="Search anime...">
+
+<input
+id="search"
+class="search"
+placeholder="Search anime..."
+autocomplete="off">
+
 </header>
 
 <main>
 
-<h1>🔥 Popular Anime</h1>
-<div id="status" class="status">Loading...</div>
+<div class="hero">
 
-<div id="grid" class="grid"></div>
+<div style="color:#ff3f91;font-weight:bold">
+WELCOME TO DIXORINO
+</div>
+
+<h1>Watch. Discover. Enjoy.</h1>
+
+<p>
+Discover thousands of anime and find your next favorite.
+</p>
+
+</div>
+
+<section id="continueSection" style="display:none">
+
+<div class="section-title">
+<h2>🕒 Continue Watching</h2>
+</div>
+
+<div id="continueGrid" class="grid"></div>
+
+</section>
+
+<section id="favoritesSection" style="display:none">
+
+<div class="section-title">
+<h2>❤️ My Favorites</h2>
+</div>
+
+<div id="favoritesGrid" class="grid"></div>
+
+</section>
+
+<section>
+
+<div class="section-title">
+<h2>🔥 Popular Anime</h2>
+</div>
+
+<div id="popular" class="grid">
+<div class="loading">Loading...</div>
+</div>
+
+</section>
+
+<section>
+
+<div class="section-title">
+<h2>🆕 Latest Anime</h2>
+</div>
+
+<div id="latest" class="grid">
+<div class="loading">Loading...</div>
+</div>
+
+</section>
+
+<section id="searchSection" style="display:none">
+
+<h2>🔎 Search Results</h2>
+
+<div id="results" class="grid"></div>
+
+</section>
 
 </main>
 
@@ -45,106 +248,67 @@ h1,h2{margin-top:25px}
 
 const API="https://api.jikan.moe/v4";
 
-const grid=document.getElementById("grid");
-const status=document.getElementById("status");
-const search=document.getElementById("search");
+let favorites=
+JSON.parse(
+localStorage.getItem("dixorinoFavorites")||"[]"
+);
 
-function card(a){
+function escapeHTML(text){
 
-const title=a.title||"Unknown";
-const image=a.images?.jpg?.large_image_url ||
-             a.images?.jpg?.image_url || "";
+return String(text)
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
+
+}
+
+function createCard(a){
+
+const id=a.mal_id;
+
+const title=
+a.title||"Unknown";
+
+const image=
+a.images?.jpg?.large_image_url||
+a.images?.jpg?.image_url||
+"";
+
+const fav=
+favorites.includes(id);
 
 return `
-<div class="card"
-onclick="openAnime(${a.mal_id})">
 
-<img class="poster"
+<div class="card"
+onclick="openAnime(${id})">
+
+<button
+class="heart ${fav?"on":""}"
+onclick="toggleFavorite(event,${id})">
+
+${fav?"♥":"♡"}
+
+</button>
+
+<img
+class="poster"
 src="${image}"
-alt="${title}"
+alt="${escapeHTML(title)}"
 loading="lazy">
 
-<h3>${title}</h3>
+<h3>${escapeHTML(title)}</h3>
 
 <p>
-${a.type||"Anime"} ·
-${a.episodes||"?"} episodes
+⭐ ${a.score||"N/A"}
+ ·
+ ${a.episodes||"?"} eps
 </p>
 
 </div>
+
 `;
-
-}
-
-async function loadPopular(){
-
-status.textContent="Loading anime...";
-
-try{
-
-const res=await fetch(
-API+"/top/anime?limit=20"
-);
-
-const data=await res.json();
-
-grid.innerHTML=data.data.map(card).join("");
-
-status.textContent=
-data.data.length+" anime loaded";
-
-}catch(error){
-
-status.textContent=
-"Couldn't load anime right now. Try again.";
-
-console.error(error);
-
-}
-
-}
-
-async function searchAnime(query){
-
-if(!query.trim()){
-
-loadPopular();
-return;
-
-}
-
-status.textContent="Searching...";
-
-try{
-
-const res=await fetch(
-API+"/anime?q="+
-encodeURIComponent(query)+
-"&limit=20"
-);
-
-const data=await res.json();
-
-if(!data.data?.length){
-
-grid.innerHTML="";
-status.textContent="No anime found.";
-return;
-
-}
-
-grid.innerHTML=
-data.data.map(card).join("");
-
-status.textContent=
-data.data.length+" results";
-
-}catch(error){
-
-status.textContent=
-"Search failed. Try again.";
-
-}
 
 }
 
@@ -155,21 +319,228 @@ location.href=
 
 }
 
+function toggleFavorite(event,id){
+
+event.stopPropagation();
+
+if(favorites.includes(id)){
+
+favorites=
+favorites.filter(x=>x!==id);
+
+}else{
+
+favorites.push(id);
+
+}
+
+localStorage.setItem(
+"dixorinoFavorites",
+JSON.stringify(favorites)
+);
+
+loadFavorites();
+
+}
+
+async function getAnime(url){
+
+const response=
+await fetch(url);
+
+const data=
+await response.json();
+
+return data.data||[];
+
+}
+
+async function loadPopular(){
+
+try{
+
+const data=
+await getAnime(
+API+"/top/anime?limit=12"
+);
+
+document.getElementById("popular").innerHTML=
+data.map(createCard).join("");
+
+}catch(e){
+
+document.getElementById("popular").innerHTML=
+"<div class='loading'>Unable to load anime.</div>";
+
+}
+
+}
+
+async function loadLatest(){
+
+try{
+
+const data=
+await getAnime(
+API+"/anime?order_by=mal_id&sort=desc&limit=12"
+);
+
+document.getElementById("latest").innerHTML=
+data.map(createCard).join("");
+
+}catch(e){
+
+document.getElementById("latest").innerHTML=
+"<div class='loading'>Unable to load anime.</div>";
+
+}
+
+}
+
+async function searchAnime(query){
+
+if(!query.trim()){
+
+document.getElementById("searchSection")
+.style.display="none";
+
+return;
+
+}
+
+document.getElementById("searchSection")
+.style.display="block";
+
+document.getElementById("results").innerHTML=
+"<div class='loading'>Searching...</div>";
+
+try{
+
+const data=
+await getAnime(
+API+"/anime?q="+
+encodeURIComponent(query)+
+"&limit=12"
+);
+
+document.getElementById("results").innerHTML=
+data.length
+?data.map(createCard).join("")
+:"<div class='loading'>No anime found.</div>";
+
+}catch(e){
+
+document.getElementById("results").innerHTML=
+"<div class='loading'>Search failed.</div>";
+
+}
+
+}
+
+function loadFavorites(){
+
+const section=
+document.getElementById("favoritesSection");
+
+const grid=
+document.getElementById("favoritesGrid");
+
+if(!favorites.length){
+
+section.style.display="none";
+return;
+
+}
+
+section.style.display="block";
+
+grid.innerHTML=
+"<div class='loading'>Loading favorites...</div>";
+
+Promise.all(
+
+favorites.slice(0,12).map(async id=>{
+
+try{
+
+const response=
+await fetch(API+"/anime/"+id);
+
+const result=
+await response.json();
+
+return result.data;
+
+}catch(e){
+
+return null;
+
+}
+
+})
+
+).then(items=>{
+
+const valid=
+items.filter(Boolean);
+
+grid.innerHTML=
+valid.map(createCard).join("");
+
+});
+
+}
+
+function loadContinue(){
+
+const saved=
+JSON.parse(
+localStorage.getItem("dixorinoLastWatched")||"null"
+);
+
+if(!saved)return;
+
+document.getElementById("continueSection")
+.style.display="block";
+
+document.getElementById("continueGrid").innerHTML=`
+
+<div class="card"
+onclick="location.href='watch.html?anime=${encodeURIComponent(saved.anime)}&episode=${saved.episode}'">
+
+<div class="poster"
+style="display:flex;align-items:center;justify-content:center;font-size:40px">
+▶
+</div>
+
+<h3>${escapeHTML(saved.anime)}</h3>
+
+<p>Episode ${saved.episode}</p>
+
+</div>
+
+`;
+
+}
+
 let timer;
 
-search.addEventListener("input",()=>{
+document.getElementById("search")
+.addEventListener("input",function(){
 
 clearTimeout(timer);
 
-timer=setTimeout(()=>{
-
-searchAnime(search.value);
-
-},500);
+timer=setTimeout(
+()=>searchAnime(this.value),
+500
+);
 
 });
 
 loadPopular();
+loadLatest();
+loadFavorites();
+loadContinue();
 
 </script>
 
