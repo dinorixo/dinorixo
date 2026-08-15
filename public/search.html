@@ -1,17 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
 <title>Search Anime — DIXORINO</title>
 
 <style>
-
-*{
-box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
 body{
 margin:0;
@@ -78,6 +74,7 @@ border-radius:15px;
 overflow:hidden;
 cursor:pointer;
 transition:.25s;
+position:relative;
 }
 
 .card:hover{
@@ -111,42 +108,85 @@ color:#999;
 padding:20px 0;
 }
 
-@media(max-width:1000px){
-.grid{
-grid-template-columns:repeat(4,1fr);
+.pagination{
+display:flex;
+justify-content:center;
+align-items:center;
+gap:15px;
+margin:35px 0;
 }
+
+.pagination button{
+background:#15151f;
+color:#fff;
+border:1px solid rgba(255,255,255,.12);
+padding:11px 18px;
+border-radius:10px;
+cursor:pointer;
+}
+
+.pagination button:hover:not(:disabled){
+border-color:#ff3f91;
+}
+
+.pagination button:disabled{
+opacity:.4;
+cursor:not-allowed;
+}
+
+#pageInfo{
+color:#aaa;
+font-size:14px;
+}
+
+.pagination{
+display:flex;
+justify-content:center;
+align-items:center;
+gap:8px;
+margin:35px 0;
+flex-wrap:wrap;
+}
+
+.pagination button{
+background:#15151f;
+color:#fff;
+border:1px solid rgba(255,255,255,.1);
+padding:10px 15px;
+border-radius:10px;
+cursor:pointer;
+}
+
+.pagination button:hover{
+border-color:#ff3f91;
+}
+
+.pagination button.active{
+background:#ff3f91;
+border-color:#ff3f91;
+}
+
+.pagination button:disabled{
+opacity:.4;
+cursor:not-allowed;
+}
+
+@media(max-width:1000px){
+.grid{grid-template-columns:repeat(4,1fr)}
 }
 
 @media(max-width:650px){
-.grid{
-grid-template-columns:repeat(3,1fr);
-}
-
-.poster{
-height:210px;
-}
+.grid{grid-template-columns:repeat(3,1fr)}
+.poster{height:210px}
 }
 
 @media(max-width:450px){
-.grid{
-grid-template-columns:repeat(2,1fr);
+.grid{grid-template-columns:repeat(2,1fr)}
+.poster{height:240px}
+header{padding:0 12px}
+.logo{font-size:21px}
 }
-
-.poster{
-height:240px;
-}
-
-header{
-padding:0 12px;
-}
-
-.logo{
-font-size:21px;
-}
-}
-
 </style>
-
 </head>
 
 <body>
@@ -168,12 +208,10 @@ autocomplete="off">
 <h1 id="title">Search Results</h1>
 
 <div id="results" class="grid">
-
-<div class="loading">
-Searching...
+<div class="loading">Searching...</div>
 </div>
 
-</div>
+<div id="pagination" class="pagination"></div>
 
 </main>
 
@@ -181,23 +219,31 @@ Searching...
 
 const API="https://graphql.anilist.co";
 
-const params=
-new URLSearchParams(location.search);
+const params=new URLSearchParams(location.search);
 
-const query=
-params.get("q")||"";
+let query=params.get("q")||"";
+let page=parseInt(params.get("page")||"1",10);
 
-document.getElementById("search").value=query;
+if(page<1) page=1;
+
+const perPage=24;
+
+const searchInput=document.getElementById("search");
+const results=document.getElementById("results");
+const title=document.getElementById("title");
+const prevBtn=document.getElementById("prevBtn");
+const nextBtn=document.getElementById("nextBtn");
+const pageInfo=document.getElementById("pageInfo");
+
+searchInput.value=query;
 
 function escapeHTML(text){
-
 return String(text)
 .replace(/&/g,"&amp;")
 .replace(/</g,"&lt;")
 .replace(/>/g,"&gt;")
 .replace(/"/g,"&quot;")
 .replace(/'/g,"&#039;");
-
 }
 
 function createCard(a){
@@ -213,13 +259,10 @@ a.coverImage?.large||
 a.coverImage?.medium||
 "";
 
-const id=a.id;
-
 return `
-
 <div
 class="card"
-onclick="location.href='details.html?anilist=${id}'">
+onclick="location.href='details.html?anilist=${a.id}'">
 
 <img
 class="poster"
@@ -227,9 +270,7 @@ src="${image}"
 alt="${escapeHTML(title)}"
 loading="lazy">
 
-<h3>
-${escapeHTML(title)}
-</h3>
+<h3>${escapeHTML(title)}</h3>
 
 <p>
 ⭐ ${
@@ -237,42 +278,47 @@ a.averageScore
 ? (a.averageScore/10).toFixed(1)
 : "N/A"
 }
- ·
- ${a.episodes||"?"} eps
+ · ${a.episodes||"?"} eps
 </p>
 
 </div>
-
 `;
-
 }
 
 async function search(){
 
 if(!query){
 
-document.getElementById("title").textContent=
-"Search Anime";
+title.textContent="Search Anime";
 
-document.getElementById("results").innerHTML=
+results.innerHTML=
 "<div class='loading'>Type an anime name to search.</div>";
+
+document.getElementById("pagination").innerHTML="";
 
 return;
 
 }
 
-document.getElementById("title").textContent=
-'Search results for "'+
-query+
-'"';
+title.textContent=
+'Search results for "'+query+'"';
+
+results.innerHTML=
+"<div class='loading'>Searching page "+page+"...</div>";
 
 try{
 
 const graphql=`
 
-query($search:String){
+query($search:String,$page:Int){
 
-Page(page:1,perPage:24){
+Page(page:$page,perPage:24){
+
+pageInfo{
+currentPage
+lastPage
+hasNextPage
+}
 
 media(
 search:$search,
@@ -305,9 +351,7 @@ episodes
 
 `;
 
-const response=await fetch(
-API,
-{
+const response=await fetch(API,{
 method:"POST",
 headers:{
 "Content-Type":"application/json",
@@ -316,33 +360,34 @@ headers:{
 body:JSON.stringify({
 query:graphql,
 variables:{
-search:query
+search:query,
+page:page
 }
 })
+});
+
+if(!response.ok){
+throw new Error("AniList HTTP "+response.status);
 }
-);
 
 const json=await response.json();
 
 if(json.errors){
-
 throw new Error(
-json.errors[0]?.message||
-"AniList error"
+json.errors[0]?.message||"AniList error"
 );
-
 }
 
-const anime=
-json.data?.Page?.media||[];
+const pageData=json.data?.Page;
 
-const results=
-document.getElementById("results");
+const anime=pageData?.media||[];
 
 if(!anime.length){
 
 results.innerHTML=
 "<div class='loading'>No anime found.</div>";
+
+document.getElementById("pagination").innerHTML="";
 
 return;
 
@@ -351,19 +396,109 @@ return;
 results.innerHTML=
 anime.map(createCard).join("");
 
+const pagination=
+document.getElementById("pagination");
+
+const lastPage=
+pageData?.pageInfo?.lastPage||page;
+
+let html="";
+
+if(page>1){
+
+html+=`
+<button onclick="goToPage(${page-1})">
+← Previous
+</button>
+`;
+
+}
+
+const startPage=Math.max(1,page-2);
+const endPage=Math.min(lastPage,page+2);
+
+for(let i=startPage;i<=endPage;i++){
+
+html+=`
+<button
+class="${i===page?"active":""}"
+onclick="goToPage(${i})">
+${i}
+</button>
+`;
+
+}
+
+if(pageData?.pageInfo?.hasNextPage){
+
+html+=`
+<button onclick="goToPage(${page+1})">
+Next →
+</button>
+`;
+
+}
+
+pagination.innerHTML=html;
+
+window.scrollTo({
+top:0,
+behavior:"smooth"
+});
+
 }catch(error){
 
-console.error(error);
+console.error("SEARCH ERROR:",error);
 
-document.getElementById("results").innerHTML=
+results.innerHTML=
 "<div class='loading'>Search is temporarily unavailable.</div>";
 
-}
+document.getElementById("pagination").innerHTML="";
 
 }
 
-document.getElementById("search")
-.addEventListener("keydown",function(e){
+}
+
+function goToPage(newPage){
+
+if(newPage<1)return;
+
+page=newPage;
+
+const url=
+"search.html?q="+
+encodeURIComponent(query)+
+"&page="+page;
+
+history.pushState({}, "", url);
+
+search();
+
+}
+
+
+
+function goToPage(newPage){
+
+if(newPage<1)return;
+
+location.href=
+"search.html?q="+
+encodeURIComponent(query)+
+"&page="+
+newPage;
+
+}
+
+prevBtn.onclick=()=>{
+goToPage(page-1);
+};
+
+nextBtn.onclick=()=>{
+goToPage(page+1);
+};
+
+searchInput.addEventListener("keydown",function(e){
 
 if(e.key==="Enter"){
 
@@ -373,7 +508,8 @@ if(q){
 
 location.href=
 "search.html?q="+
-encodeURIComponent(q);
+encodeURIComponent(q)+
+"&page=1";
 
 }
 
