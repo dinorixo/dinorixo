@@ -266,16 +266,40 @@ Number(params.get("total"))||12
 );
 
 const player=document.getElementById("player");
-const videoUrl=params.get("video")||"";
-
-if(videoUrl){
-  player.src=videoUrl;
-  player.load();
-}else{
-  status.textContent="No authorized video source configured.";
-}
 const status=document.getElementById("playerStatus");
 const progressBar=document.getElementById("progressBar");
+
+const videoUrl=params.get("video")||"";
+const videoKey=(id||"")+"_"+episode;
+
+async function loadVideoSource(){
+
+  if(videoUrl){
+    player.src=videoUrl;
+    player.load();
+    return;
+  }
+
+  try{
+    const r=await fetch("data/videos.json");
+    const videos=await r.json();
+    const source=videos[videoKey];
+
+    if(source){
+      player.src=source;
+      player.load();
+      status.textContent="Loading video...";
+    }else{
+      status.textContent="No authorized video source configured for this episode.";
+    }
+
+  }catch(e){
+    console.error(e);
+    status.textContent="Could not load video source.";
+  }
+}
+
+loadVideoSource();
 
 document.title="DIXORINO - "+anime;
 
