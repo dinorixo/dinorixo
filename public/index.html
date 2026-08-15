@@ -219,6 +219,7 @@ Discover thousands of anime and find your next favorite.
 <div id="popular" class="grid">
 <div class="loading">Loading...</div>
 </div>
+<button id="loadPopular" class="load-more" onclick="loadMorePopular()">Load More</button>
 
 </section>
 
@@ -231,6 +232,7 @@ Discover thousands of anime and find your next favorite.
 <div id="latest" class="grid">
 <div class="loading">Loading...</div>
 </div>
+<button id="loadLatest" class="load-more" onclick="loadMoreLatest()">Load More</button>
 
 </section>
 
@@ -399,6 +401,80 @@ document.getElementById("latest").innerHTML=
 "<div class='loading'>Unable to load anime.</div>";
 
 }
+
+}
+
+
+let popularPage=1;
+let latestPage=1;
+
+async function loadMorePopular(){
+
+  const button=document.getElementById("loadPopular");
+  button.disabled=true;
+  button.textContent="Loading...";
+
+  try{
+
+    popularPage++;
+
+    const data=await getAnime(
+      API+"/top/anime?page="+popularPage+"&limit=24"
+    );
+
+    if(data.length){
+      document.getElementById("popular").insertAdjacentHTML(
+        "beforeend",
+        data.map(createCard).join("")
+      );
+      button.disabled=false;
+      button.textContent="Load More";
+    }else{
+      button.textContent="No more anime";
+    }
+
+  }catch(e){
+
+    popularPage--;
+    button.disabled=false;
+    button.textContent="Try Again";
+
+  }
+
+}
+
+async function loadMoreLatest(){
+
+  const button=document.getElementById("loadLatest");
+  button.disabled=true;
+  button.textContent="Loading...";
+
+  try{
+
+    latestPage++;
+
+    const data=await getAnime(
+      API+"/anime?order_by=mal_id&sort=desc&page="+latestPage+"&limit=24"
+    );
+
+    if(data.length){
+      document.getElementById("latest").insertAdjacentHTML(
+        "beforeend",
+        data.map(createCard).join("")
+      );
+      button.disabled=false;
+      button.textContent="Load More";
+    }else{
+      button.textContent="No more anime";
+    }
+
+  }catch(e){
+
+    latestPage--;
+    button.disabled=false;
+    button.textContent="Try Again";
+
+  }
 
 }
 
