@@ -732,77 +732,153 @@ async function loadEpisodes(){
 
   const box=document.getElementById("episodes");
 
-  const total=Number(animeData?.episodes)||0;
-
-  if(!total){
-    box.innerHTML=
-      "<div class='loading'>No episode information available.</div>";
+  if(!box){
     return;
   }
 
-  let episodes=[];
+  box.innerHTML=
+    '<div class="loading">Finding official streaming links...</div>';
 
-  /*
-   * If we have a MAL ID, get the real episode list.
-   * Otherwise use AniList's episode count.
-   */
+  try{
 
-  if(animeData?.mal_id){
+    let mediaQuery;
+    let variables;
 
-    try{
+    if(anilistId){
 
-      const r=await fetch(
-        API+"/anime/"+animeData.mal_id+"/episodes"
-      );
+      mediaQuery=`
+        query($id:Int){
+          Media(id:$id,type:ANIME){
+            id
+            episodes
+            streamingEpisodes{
+              title
+              thumbnail
+              url
+              site
+            }
+          }
+        }
+      `;
 
-      if(r.ok){
+      variables={
+        id:Number(anilistId)
+      };
 
-        const x=await r.json();
-        episodes=x.data||[];
+    }else if(id){
 
-      }
+      mediaQuery=`
+        query($idMal:Int){
+          Media(idMal:$idMal,type:ANIME){
+            id
+            episodes
+            streamingEpisodes{
+              title
+              thumbnail
+              url
+              site
+            }
+          }
+        }
+      `;
 
-    }catch(e){
+      variables={
+        idMal:Number(id)
+      };
 
-      console.log("Jikan episode list unavailable");
+    }else{
 
+      box.innerHTML=
+        '<div class="loading">Anime ID unavailable.</div>';
+
+      return;
     }
 
+    const response=await fetch(ANILIST,{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "Accept":"application/json"
+      },
+      body:JSON.stringify({
+        query:mediaQuery,
+        variables:variables
+      })
+    });
+
+    if(!response.ok){
+      throw new Error("AniList HTTP "+response.status);
+    }
+
+    const json=await response.json();
+
+    if(json.errors){
+      throw new Error(
+        json.errors[0]?.message||"Streaming links unavailable"
+      );
+    }
+
+    const media=json.data?.Media;
+    const streams=media?.streamingEpisodes||[];
+
+    if(!streams.length){
+
+      const total=Number(media?.episodes||animeData?.episodes||0);
+
+      box.innerHTML=`
+        <div class="loading">
+          No official streaming links are currently available for this anime.
+          ${total ? `<br><small>${total} episodes listed.</small>` : ""}
+        </div>
+      `;
+
+      return;
+    }
+
+    box.innerHTML=streams.map((ep,index)=>{
+
+      const episodeNumber=index+1;
+
+      const title=
+        ep.title||
+        "Episode "+episodeNumber;
+
+      const site=
+        ep.site||
+        "Official streaming site";
+
+      return `
+        <a
+          class="ep"
+          href="${safe(ep.url)}"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="${safe(title)}"
+          style="
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:center;
+            text-decoration:none;
+          "
+        >
+          <strong>Episode ${episodeNumber}</strong>
+          <small style="opacity:.65;margin-top:4px">
+            ${safe(site)}
+          </small>
+        </a>
+      `;
+
+    }).join("");
+
+  }catch(error){
+
+    console.error("Streaming links error:",error);
+
+    box.innerHTML=
+      '<div class="loading">Official streaming links are temporarily unavailable.</div>';
+
   }
-
-  /*
-   * Fallback for anime without MAL episode data.
-   */
-
-  if(!episodes.length){
-
-    episodes=Array.from(
-      {length:total},
-      (_,i)=>({mal_id:i+1})
-    );
-
-  }
-
-  box.innerHTML=episodes.map(ep=>`
-
-    <button class="ep"
-      onclick="openEpisode(${ep.mal_id})">
-      Episode ${ep.mal_id}
-    </button>
-
-  `).join("");
-
-}
-
-
-function openEpisode(number){
-
-  location.href=
-    "watch.html?anime="+
-    encodeURIComponent(animeData.title)+
-    "&episode="+number+
-    "&id="+(animeData.mal_id||id)+
-    "&total="+(animeData.episodes||12);
 
 }
 
