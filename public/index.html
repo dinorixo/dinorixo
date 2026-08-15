@@ -534,49 +534,65 @@ async function openGenre(id,name){
 
 document.getElementById("searchSection").style.display="block";
 document.getElementById("results").innerHTML=
-"<div class='loading'>Loading "+name+" anime...</div>";
-
-const urls=[
-API+"/anime?genres="+id+"&order_by=score&sort=desc&limit=12",
-API+"/anime?genres="+id+"&limit=12"
-];
-
-for(const url of urls){
+"<div class='loading'>Finding "+name+" anime...</div>";
 
 try{
 
-const response=await fetch(url);
+let matches=[];
+let page=1;
 
-if(!response.ok) continue;
+while(matches.length<12 && page<=3){
 
-const data=await response.json();
+const response=await fetch(
+API+"/top/anime?page="+page+"&limit=25"
+);
 
-if(data.data && data.data.length){
+if(!response.ok) throw new Error("API error");
+
+const json=await response.json();
+const anime=json.data||[];
+
+for(const a of anime){
+
+if((a.genres||[]).some(g=>g.mal_id===id)){
+matches.push(a);
+}
+
+if(matches.length>=12) break;
+
+}
+
+page++;
+
+}
+
+if(matches.length){
 
 document.getElementById("results").innerHTML=
 "<h2>"+name+" Anime</h2>"+
-data.data.map(createCard).join("");
+matches.map(createCard).join("");
+
+}else{
+
+document.getElementById("results").innerHTML=
+"<div class='loading'>No "+name+" anime found.</div>";
+
+}
 
 window.scrollTo({
 top:document.getElementById("searchSection").offsetTop-80,
 behavior:"smooth"
 });
 
-return;
-
-}
-
 }catch(e){
 
-console.log("Genre request failed:",e);
-
-}
-
-}
+console.error(e);
 
 document.getElementById("results").innerHTML=
-"<div class='loading'>"+name+
-" anime is temporarily unavailable. Please try again in a moment.</div>";
+"<div class='loading'>Could not load "+name+
+" anime right now. Please try again.</div>";
+
+}
 
 }
 
