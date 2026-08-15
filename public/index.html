@@ -1400,6 +1400,96 @@ genreList.map(name=>`
 `).join("");
 
 
+
+async function loadPopular(){
+
+  const box = document.getElementById("popularGrid");
+
+  if(!box) return;
+
+  box.innerHTML =
+    '<div class="loading">Loading popular anime...</div>';
+
+  try{
+
+    const response = await fetch(
+      API + "/top/anime?limit=18"
+    );
+
+    if(!response.ok){
+      throw new Error("Popular API: " + response.status);
+    }
+
+    const json = await response.json();
+    const data = json.data || [];
+
+    if(!data.length){
+      box.innerHTML =
+        '<div class="loading">No popular anime found.</div>';
+      return;
+    }
+
+    box.innerHTML =
+      data.map(createCard).join("");
+
+  }catch(error){
+
+    console.error("Popular error:", error);
+
+    box.innerHTML =
+      '<div class="loading">Popular anime unavailable.</div>';
+
+  }
+}
+
+
+async function loadLatest(){
+
+  const box = document.getElementById("latest");
+
+  if(!box) return;
+
+  box.innerHTML =
+    '<div class="loading">Loading latest anime...</div>';
+
+  try{
+
+    /*
+      Use the Jikan seasonal endpoint instead of
+      /anime?order_by=mal_id because that endpoint
+      has been returning 504 from MAL.
+    */
+
+    const response = await fetch(
+      API + "/seasons/now?limit=18"
+    );
+
+    if(!response.ok){
+      throw new Error("Latest API: " + response.status);
+    }
+
+    const json = await response.json();
+    const data = json.data || [];
+
+    if(!data.length){
+      box.innerHTML =
+        '<div class="loading">No latest anime found.</div>';
+      return;
+    }
+
+    box.innerHTML =
+      data.map(createCard).join("");
+
+  }catch(error){
+
+    console.error("Latest error:", error);
+
+    box.innerHTML =
+      '<div class="loading">Latest anime unavailable.</div>';
+
+  }
+}
+
 async function openGenre(name){
 
   const section=document.getElementById("searchSection");
@@ -1625,6 +1715,15 @@ async function loadTrending(){
 }
 
 loadTrending();
+
+setTimeout(() => {
+  loadPopular();
+}, 1500);
+
+setTimeout(() => {
+  loadLatest();
+}, 3000);
+
 
 setTimeout(loadPopular,1000);
 setTimeout(loadLatest,2000);
