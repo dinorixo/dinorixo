@@ -209,9 +209,6 @@ controls
 playsinline
 preload="metadata">
 
-<source
-src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
-type="video/mp4">
 
 Your browser does not support video playback.
 
@@ -269,6 +266,14 @@ Number(params.get("total"))||12
 );
 
 const player=document.getElementById("player");
+const videoUrl=params.get("video")||"";
+
+if(videoUrl){
+  player.src=videoUrl;
+  player.load();
+}else{
+  status.textContent="No authorized video source configured.";
+}
 const status=document.getElementById("playerStatus");
 const progressBar=document.getElementById("progressBar");
 
