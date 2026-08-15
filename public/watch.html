@@ -4,117 +4,25 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>DIXORINO - Watch</title>
-
 <style>
 *{box-sizing:border-box}
-
-body{
-margin:0;
-background:#08090d;
-color:#fff;
-font-family:Arial,sans-serif
-}
-
-header{
-height:70px;
-background:#10121a;
-display:flex;
-align-items:center;
-padding:0 20px;
-gap:25px
-}
-
-.logo{
-font-size:27px;
-font-weight:900;
-color:#ff3f91
-}
-
-header a{
-color:#fff;
-text-decoration:none
-}
-
-main{
-max-width:1100px;
-margin:auto;
-padding:20px
-}
-
-.back{
-color:#ff3f91;
-text-decoration:none
-}
-
-.player{
-margin-top:20px;
-background:#000;
-aspect-ratio:16/9;
-border-radius:12px;
-overflow:hidden
-}
-
-video{
-width:100%;
-height:100%
-}
-
-.title{
-margin-top:20px
-}
-
-.title h1{
-margin-bottom:5px
-}
-
-.muted{
-color:#999
-}
-
-.controls{
-display:flex;
-gap:10px;
-margin:20px 0
-}
-
-.control{
-background:#191c26;
-color:white;
-padding:12px 18px;
-border-radius:8px;
-text-decoration:none
-}
-
-.control:hover{
-background:#ff3f91
-}
-
-.episodes{
-display:grid;
-grid-template-columns:repeat(5,1fr);
-gap:9px
-}
-
-.ep{
-background:#191c26;
-color:white;
-border:0;
-padding:13px;
-border-radius:7px
-}
-
-.ep:hover,.ep.active{
-background:#ff3f91
-}
-
-.notice{
-margin-top:20px;
-padding:15px;
-background:#151821;
-border-radius:10px;
-color:#aaa
-}
-
+body{margin:0;background:#08090d;color:#fff;font-family:Arial,sans-serif}
+header{height:70px;background:#10121a;display:flex;align-items:center;padding:0 20px;gap:25px}
+.logo{font-size:27px;font-weight:900;color:#ff3f91}
+header a{color:#fff;text-decoration:none}
+main{max-width:1100px;margin:auto;padding:20px}
+.back{color:#ff3f91;text-decoration:none}
+.player{margin-top:20px;background:#000;border-radius:12px;overflow:hidden;aspect-ratio:16/9}
+video{width:100%;height:100%;display:block}
+h1{margin-bottom:5px}
+.muted{color:#999}
+.controls{display:flex;gap:10px;margin:20px 0;flex-wrap:wrap}
+.control{background:#191c26;color:#fff;padding:12px 18px;border-radius:8px;text-decoration:none}
+.control:hover{background:#ff3f91}
+.episodes{display:grid;grid-template-columns:repeat(6,1fr);gap:9px}
+.ep{background:#191c26;color:#fff;border:0;padding:13px;border-radius:7px}
+.ep:hover,.ep.active{background:#ff3f91}
+.notice{margin-top:20px;padding:15px;background:#151821;border-radius:10px;color:#aaa}
 @media(max-width:600px){
 main{padding:15px}
 .episodes{grid-template-columns:repeat(3,1fr)}
@@ -126,7 +34,7 @@ main{padding:15px}
 
 <header>
 <div class="logo">DIXORINO</div>
-<a href="/">Home</a>
+<a id="home" href="/">Home</a>
 </header>
 
 <main>
@@ -134,128 +42,90 @@ main{padding:15px}
 <a class="back" id="back">← Back to Anime</a>
 
 <div class="player">
-
 <video id="player" controls playsinline>
-<source
-src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
-type="video/mp4">
+<source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4">
 </video>
-
 </div>
 
-<div class="title">
-<h1 id="anime">Anime</h1>
-<div class="muted" id="episode">Episode 1</div>
-</div>
+<h1 id="title">Loading...</h1>
+<div class="muted" id="episode"></div>
 
 <div class="controls">
-
 <a class="control" id="previous">← Previous</a>
-
 <a class="control" id="next">Next →</a>
-
 </div>
 
 <h2>Episodes</h2>
-
 <div class="episodes" id="episodes"></div>
 
 <div class="notice">
-Demo video player. For real anime episodes, connect only videos you own or have permission/license to stream.
+Demo player. Only use video content that you own or are authorized to stream.
 </div>
 
 </main>
 
 <script>
 
-const params=
-new URLSearchParams(location.search);
+const params=new URLSearchParams(location.search);
 
-const anime=
-params.get("anime")||"Anime";
+const anime=params.get("anime")||"Anime";
+const id=params.get("id")||"";
+const episode=Number(params.get("episode"))||1;
+const total=Number(params.get("total"))||12;
 
-const episode=
-Number(params.get("episode"))||1;
+document.title="DIXORINO - "+anime;
 
-const total=
-Number(params.get("total"))||12;
-
-document.getElementById("anime").textContent=
-anime;
+document.getElementById("title").textContent=anime;
 
 document.getElementById("episode").textContent=
 "Episode "+episode;
 
-document.title=
-"DIXORINO - "+anime;
-
 document.getElementById("back").href=
-"details.html?id="+
-encodeURIComponent(params.get("id")||"");
+id ? "details.html?id="+id : "/";
 
-const previous=
-document.getElementById("previous");
+function watchURL(ep){
 
-const next=
-document.getElementById("next");
-
-if(episode>1){
-
-previous.href=
-"watch.html?anime="+
+return "watch.html?anime="+
 encodeURIComponent(anime)+
-"&episode="+
-(episode-1)+
+"&episode="+ep+
+"&id="+encodeURIComponent(id)+
 "&total="+total;
 
-}else{
+}
 
+const previous=document.getElementById("previous");
+const next=document.getElementById("next");
+
+if(episode>1){
+previous.href=watchURL(episode-1);
+}else{
 previous.style.opacity=".4";
 previous.style.pointerEvents="none";
-
 }
 
 if(episode<total){
-
-next.href=
-"watch.html?anime="+
-encodeURIComponent(anime)+
-"&episode="+
-(episode+1)+
-"&total="+total;
-
+next.href=watchURL(episode+1);
 }else{
-
 next.style.opacity=".4";
 next.style.pointerEvents="none";
-
 }
 
-const box=
-document.getElementById("episodes");
+const box=document.getElementById("episodes");
 
 for(let i=1;i<=total;i++){
 
-const b=
-document.createElement("button");
+const button=document.createElement("button");
 
-b.className=
-"ep "+(i===episode?"active":"");
+button.className="ep"+
+(i===episode?" active":"");
 
-b.textContent=
-"Episode "+i;
+button.textContent="Episode "+i;
 
-b.onclick=()=>{
-
-location.href=
-"watch.html?anime="+
-encodeURIComponent(anime)+
-"&episode="+i+
-"&total="+total;
-
+button.onclick=()=>{
+location.href=watchURL(i);
 };
 
-box.appendChild(b);
+box.appendChild(button);
 
 }
 
@@ -263,7 +133,8 @@ localStorage.setItem(
 "dixorinoLastWatched",
 JSON.stringify({
 anime:anime,
-episode:episode
+episode:episode,
+id:id
 })
 );
 
