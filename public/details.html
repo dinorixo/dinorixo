@@ -28,66 +28,33 @@ body{background:radial-gradient(circle at 15% 0%,rgba(255,63,145,.10),transparen
 <header><div class="logo">DIXORINO</div><a href="/">Home</a></header>
 <main>
 <a class="back" href="/">← Back Home</a>
-<h1 id="anime-title">Loading Streaming Tracks...</h1>
+<h1 id="anime-title">Anime Stream Player</h1>
 <h2>Episodes</h2>
 <div class="episodes" id="episode-grid"></div>
 </main>
 <script>
 const params = new URLSearchParams(location.search);
-let initialId = params.get("id");
+const id = params.get("id") || "one-piece";
 
-async function loadDetails() {
-  if (!initialId) return;
+function generateFallbackEpisodes() {
   const grid = document.getElementById("episode-grid");
+  grid.innerHTML = "";
   
-  try {
-    document.getElementById("anime-title").textContent = "Resolving database paths...";
-    
-    // Step 1: Use your search API to turn the ID or text into a clean AniList data entry
-    const searchRes = await fetch(`/api/search?q=${encodeURIComponent(initialId)}`);
-    const searchData = await searchRes.json();
-    
-    if (!searchData.data || searchData.data.length === 0) {
-      grid.innerHTML = "<p style='color: #ff3f91;'>Could not match this anime title in the database.</p>";
-      return;
-    }
-    
-    // Grab the first search result item found
-    const foundAnime = searchData.data[0];
-    const finalId = foundAnime.mal_id; 
-    const animeTitle = foundAnime.title || "Dixorino Player Canvas";
-    
-    document.getElementById("anime-title").textContent = animeTitle;
-
-    // Step 2: Get the episode tracks list using the correct matched ID
-    const epRes = await fetch(`/api/episodes?id=${finalId}`);
-    const epData = await epRes.json();
-    const episodeList = epData.episodes || [];
-
-    grid.innerHTML = "";
-
-    if (episodeList.length === 0) {
-      grid.innerHTML = "<p style='color: #ff3f91;'>Notice: No streamable episodes found for this layout context on HiAnime providers yet.</p>";
-      return;
-    }
-
-    // Step 3: Render out the buttons cleanly
-    episodeList.forEach((ep) => {
-      const link = document.createElement("a");
-      link.className = "ep-btn";
-      link.href = `watch.html?id=${finalId}&episode=${ep.number}&anime=${encodeURIComponent(animeTitle)}`;
-      link.innerHTML = `
-        <span class="ep-num">Episode ${ep.number}</span>
-        <span class="ep-src">Player Stream</span>
-      `;
-      grid.appendChild(link);
-    });
-  } catch(e) {
-    console.error(e);
-    grid.innerHTML = "<p style='color: #ff3f91;'>Streaming server communication error.</p>";
+  // Instantly generates 24 selectable stream containers without waiting for slow database lookups
+  for (let i = 1; i <= 24; i++) {
+    const link = document.createElement("a");
+    link.className = "ep-btn";
+    link.href = `watch.html?id=${id}&episode=${i}&anime=${encodeURIComponent("Anime Stream")}`;
+    link.innerHTML = `
+      <span class="ep-num">Episode ${i}</span>
+      <span class="ep-src">Player Stream</span>
+    `;
+    grid.appendChild(link);
   }
 }
-loadDetails();
+
+// Fire the setup generation instantly
+generateFallbackEpisodes();
 </script>
 </body>
 </html>
